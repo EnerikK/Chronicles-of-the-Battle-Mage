@@ -1,5 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+//Hello :)
 
 #include "Player/BMPlayerController.h"
 #include "EnhancedInputSubsystems.h"
@@ -22,11 +21,14 @@ void ABMPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	if(Subsystem)
 	{
 		Subsystem->AddMappingContext(BMContest,0);
 	}
+	
+	
 	
 }
 
