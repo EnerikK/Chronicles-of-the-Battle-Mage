@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerState.h"
 #include "BMPlayerState.generated.h"
 
+class ABMPlayerController;
 class UAbilitySystemComponent;
 class UAttributeSet;
 /**
@@ -25,6 +26,9 @@ public:
 	
 
 protected:
+
+	UPROPERTY()
+	ABMPlayerController* Controller;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;

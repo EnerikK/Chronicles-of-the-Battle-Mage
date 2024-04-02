@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "BMGameplayTags.h"
 #include "AbilitySystem/BMAbilitySystemComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/BMPlayerState.h"
 
 ABMCharacterBase::ABMCharacterBase()
@@ -40,6 +41,7 @@ void ABMCharacterBase::InitAbilityActorInfo()
 {
 	ABMPlayerState* BattleMagePlayerState = GetPlayerState<ABMPlayerState>();
 	check(BattleMagePlayerState)
+	
 	BattleMagePlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(BattleMagePlayerState,this);
 	Cast<UBMAbilitySystemComponent>(BattleMagePlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 	AbilitySystemComponent = BattleMagePlayerState->GetAbilitySystemComponent();

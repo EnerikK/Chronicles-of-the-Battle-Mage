@@ -3,6 +3,7 @@
 #include "Player/BMPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "GameFramework/Controller.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/Character.h"
 
@@ -21,7 +22,7 @@ void ABMPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	check(BMContest);
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	if(Subsystem)
 	{
@@ -49,7 +50,6 @@ void ABMPlayerController::SetupInputComponent()
 
 void ABMPlayerController::Move(const FInputActionValue& Value)
 {
-	FVector2D MovementVector = Value.Get<FVector2D>();
 	APawn* ControlledPawn = GetPawn<APawn>();
 
 	if(ControlledPawn != nullptr)

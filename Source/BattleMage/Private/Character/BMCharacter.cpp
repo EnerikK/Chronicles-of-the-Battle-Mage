@@ -3,11 +3,12 @@
 
 #include "Character/BMCharacter.h"
 #include "AbilitySystemComponent.h"
-#include "MeshAttributeArray.h"
 #include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/BMPlayerState.h"
 
 ABMCharacter::ABMCharacter()
@@ -33,26 +34,22 @@ ABMCharacter::ABMCharacter()
 void ABMCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	
-	InitAbilityActorInfo();//Here we have the server actor info 
+	InitAbilityActorInfo();
 }
+
 
 void ABMCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
-	
-	InitAbilityActorInfo();//meanwhile here we have the actor info for the client 
+	InitAbilityActorInfo();
 }
 
 void ABMCharacter::InitAbilityActorInfo()
 {
-	ABMPlayerState* BattleMagePlayerState = GetPlayerStateChecked<ABMPlayerState>();
-	check(BattleMagePlayerState);
-	
+	ABMPlayerState* BattleMagePlayerState = GetPlayerState<ABMPlayerState>();
+	check(BattleMagePlayerState)
+
 	BattleMagePlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(BattleMagePlayerState,this);
-	Cast<UBMAbilitySystemComponent>(BattleMagePlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 	AbilitySystemComponent = BattleMagePlayerState->GetAbilitySystemComponent();AttributeSet = BattleMagePlayerState->GetAttributeSet();
 	AttributeSet = BattleMagePlayerState->GetAttributeSet();
-	
-	
 }
