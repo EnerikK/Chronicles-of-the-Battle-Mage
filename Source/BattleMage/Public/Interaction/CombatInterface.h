@@ -7,6 +7,8 @@
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
 
+#define TRACE 80000.f
+
 USTRUCT(BlueprintType)
 struct FTaggedMontage
 {
@@ -50,7 +52,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
 	UAnimMontage* GetHitReactMontage();
 
+private:
+
 	
-
-
+	
+	
 };

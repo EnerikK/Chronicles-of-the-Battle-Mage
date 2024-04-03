@@ -14,11 +14,6 @@ ABMCharacterBase::ABMCharacterBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	const FBattleMageGameplayTags& GameplayTags = FBattleMageGameplayTags::Get();
-
-	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
-	Weapon->SetupAttachment(GetMesh(),FName("WeaponHandSocket"));
-	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
 	
 }
 void ABMCharacterBase::Tick(float DeltaTime)
@@ -40,11 +35,7 @@ UAnimMontage* ABMCharacterBase::GetHitReactMontage_Implementation()
 FVector ABMCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
 	const FBattleMageGameplayTags& GameplayTags = FBattleMageGameplayTags::Get();
-	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon)&& IsValid(Weapon))
-	{
-		return Weapon->GetSocketLocation(WeaponTipSocketName);
-
-	}
+	
 	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_LeftHand))
 	{
 		return GetMesh()->GetSocketLocation(LeftHandSocketName);

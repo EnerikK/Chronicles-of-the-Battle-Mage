@@ -7,7 +7,10 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Interaction/CombatComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "Player/BMPlayerState.h"
+#include "Weapon/Weapon.h"
 
 ABMCharacter::ABMCharacter()
 {
@@ -27,12 +30,20 @@ ABMCharacter::ABMCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
+
+	Combat = CreateDefaultSubobject<UCombatComponent>("Combat");
+	Combat->SetIsReplicated(true);
 	
 }
-
 void ABMCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+}
+
+void ABMCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(ABMCharacter,OverlappingWeapon,COND_OwnerOnly);
 
 }
 
@@ -41,12 +52,55 @@ void ABMCharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 	InitAbilityActorInfo();
 }
-
-
 void ABMCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 	InitAbilityActorInfo();
+}
+
+void ABMCharacter::SetOverlappingWeapon(AWeapon* Weapon)
+{
+	if(OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickUpWidget(false);
+	}
+	OverlappingWeapon = Weapon;
+	if(IsLocallyControlled())
+	{
+		if(OverlappingWeapon)
+		{
+			OverlappingWeapon->ShowPickUpWidget(true);
+		}
+	}
+}
+
+void ABMCharacter::EquipButtonPressed()
+{
+	if(Combat)
+	{
+		if(Combat->CombatState == ECombatState::ECState_Unoccupied) ServerEquipButtonPressed();
+		if(!HasAuthority() && Combat->CombatState == ECombatState::ECState_Unoccupied && OverlappingWeapon == nullptr)
+		{
+			Combat->CombatState = ECombatState::ECState_SwapWeapons;
+		}
+	}
+}
+
+AWeapon* ABMCharacter::GetEquippedWeapon()
+{
+	if(Combat == nullptr) return nullptr;
+	return Combat->EquippedWeapon;
+}
+
+void ABMCharacter::ServerEquipButtonPressed_Implementation()
+{
+	if(Combat)
+	{
+		if(OverlappingWeapon)
+		{
+			Combat->EquipWeapon(OverlappingWeapon);
+		}
+	}
 }
 
 void ABMCharacter::InitAbilityActorInfo()
@@ -57,4 +111,16 @@ void ABMCharacter::InitAbilityActorInfo()
 	BattleMagePlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(BattleMagePlayerState,this);
 	AbilitySystemComponent = BattleMagePlayerState->GetAbilitySystemComponent();AttributeSet = BattleMagePlayerState->GetAttributeSet();
 	AttributeSet = BattleMagePlayerState->GetAttributeSet();
+}
+
+void ABMCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
+{
+	if(OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickUpWidget(true);
+	}
+	if(LastWeapon)
+	{
+		LastWeapon->ShowPickUpWidget(false);
+	}
 }
