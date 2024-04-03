@@ -3,12 +3,10 @@
 
 #include "Character/BMCharacter.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "Player/BMPlayerState.h"
 
 ABMCharacter::ABMCharacter()
@@ -29,6 +27,13 @@ ABMCharacter::ABMCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
+	
+}
+
+void ABMCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
 }
 
 void ABMCharacter::PossessedBy(AController* NewController)

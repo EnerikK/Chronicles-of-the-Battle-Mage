@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "BMPlayerController.generated.h"
 
+class IEnemyInterface;
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
@@ -30,6 +31,11 @@ protected:
 	virtual void SetupInputComponent() override;
 
 private:
+
+	void CursorTrace();
+
+	IEnemyInterface* LastActor;
+	IEnemyInterface* ThisActor;
 
 	UPROPERTY(EditAnywhere,Category="Input")
 	TObjectPtr<UInputMappingContext> BMContest;

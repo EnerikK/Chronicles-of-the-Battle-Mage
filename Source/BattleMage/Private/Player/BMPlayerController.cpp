@@ -6,6 +6,7 @@
 #include "GameFramework/Controller.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/Character.h"
+#include "Interaction/EnemyInterface.h"
 
 
 ABMPlayerController::ABMPlayerController()
@@ -16,6 +17,7 @@ ABMPlayerController::ABMPlayerController()
 void ABMPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
+	CursorTrace();
 }
 
 void ABMPlayerController::BeginPlay()
@@ -28,9 +30,6 @@ void ABMPlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(BMContest,0);
 	}
-	
-	
-	
 }
 
 void ABMPlayerController::SetupInputComponent()
@@ -45,6 +44,49 @@ void ABMPlayerController::SetupInputComponent()
 		LookAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Look);
 	EnhancedInputComponent->BindAction(
 		JumpAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Jump);
+	
+}
+
+void ABMPlayerController::CursorTrace()
+{
+	FHitResult CursorHit;
+	GetHitResultUnderCursor(ECC_Visibility,false,CursorHit);
+	if(!CursorHit.bBlockingHit) return;
+
+	LastActor = ThisActor;
+
+	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
+	
+	if(LastActor == nullptr)
+	{
+		if(ThisActor != nullptr)
+		{
+			ThisActor->Highlight();
+		}
+		else
+		{
+			// do nothing
+		}
+	}
+	else
+	{
+		if(ThisActor == nullptr)
+		{
+			LastActor->UnHighlight();
+		}
+		else
+		{
+			if(LastActor != ThisActor)
+			{
+				LastActor->UnHighlight();
+				ThisActor->Highlight();
+			}
+			else
+			{
+				// do nothing
+			}
+		}
+	}
 	
 }
 

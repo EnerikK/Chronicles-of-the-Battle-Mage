@@ -30,4 +30,19 @@ void FBattleMageGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.InputTag_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag
 	(FName("InputTag.4"),
 	FString("Input tag for the 4 Key"));
+
+	/*
+	* Combat sockets
+	*/
+	GameplayTags.CombatSocket_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("CombatSocket.Weapon"),
+	FString("WeaponAttacks"));
+	
+	GameplayTags.CombatSocket_RightHand = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("CombatSocket.RightHand"),
+	FString("RightHands Attacks"));
+	
+	GameplayTags.CombatSocket_LeftHand = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("CombatSocket.LeftHand"),
+	FString("LeftHand Attacks"));
 }

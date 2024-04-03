@@ -25,6 +25,10 @@ public:
  FGameplayTag InputTag_2;
  FGameplayTag InputTag_3;
  FGameplayTag InputTag_4;
+
+ FGameplayTag CombatSocket_Weapon;
+ FGameplayTag CombatSocket_RightHand;
+ FGameplayTag CombatSocket_LeftHand;
  
 
 private:

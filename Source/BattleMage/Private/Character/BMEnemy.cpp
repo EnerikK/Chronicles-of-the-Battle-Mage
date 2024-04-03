@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "AbilitySystem/BMAttributeSet.h"
+#include "BattleMage/BattleMage.h"
 
 ABMEnemy::ABMEnemy()
 {
@@ -12,7 +13,20 @@ ABMEnemy::ABMEnemy()
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility,ECR_Block);
+
 	AttributeSet = CreateDefaultSubobject<UBMAttributeSet>("Attribute");
+}
+
+void ABMEnemy::Highlight()
+{
+	GetMesh()->SetRenderCustomDepth(true);
+	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
+}
+
+void ABMEnemy::UnHighlight()
+{
+	GetMesh()->SetRenderCustomDepth(false);
 }
 
 void ABMEnemy::BeginPlay()
