@@ -30,13 +30,11 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
+	virtual void PostInitializeComponents() override;
+	
 	void SetOverlappingWeapon(AWeapon* Weapon);
-
-
 	void EquipButtonPressed();
-
-
-
+	
 	AWeapon* GetEquippedWeapon();
 
 protected:

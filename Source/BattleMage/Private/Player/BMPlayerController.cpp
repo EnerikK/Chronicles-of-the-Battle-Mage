@@ -15,10 +15,15 @@ ABMPlayerController::ABMPlayerController()
 	bReplicates = true;
 }
 
-void ABMPlayerController::PlayerTick(float DeltaTime)
+void ABMPlayerController::Tick(float DeltaSeconds)
 {
-	Super::PlayerTick(DeltaTime);
+	Super::Tick(DeltaSeconds);
 	CursorTrace();
+}
+
+void ABMPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
 }
 
 void ABMPlayerController::BeginPlay()
@@ -45,6 +50,9 @@ void ABMPlayerController::SetupInputComponent()
 		LookAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Look);
 	EnhancedInputComponent->BindAction(
 		JumpAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Jump);
+	EnhancedInputComponent->BindAction(
+		EquipAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Equip);
+	
 	
 }
 
@@ -144,10 +152,12 @@ void ABMPlayerController::Jump(const FInputActionValue& Value)
 
 void ABMPlayerController::Equip(const FInputActionValue& Value)
 {
-	ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter());
-	if(ControlledCharacter)
+	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
-		ControlledCharacter->EquipButtonPressed();
+		if(GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1,15.f,FColor::Red,TEXT("Pressed E"));
+			ControlledCharacter->EquipButtonPressed();
+		}
 	}
-	
 }

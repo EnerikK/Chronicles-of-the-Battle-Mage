@@ -58,6 +58,16 @@ void ABMCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
+void ABMCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if(Combat)
+	{
+		Combat->Character = this;
+	}
+	
+}
+
 void ABMCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {
 	if(OverlappingWeapon)
@@ -78,7 +88,15 @@ void ABMCharacter::EquipButtonPressed()
 {
 	if(Combat)
 	{
-		if(Combat->CombatState == ECombatState::ECState_Unoccupied) ServerEquipButtonPressed();
+		if(Combat->CombatState == ECombatState::ECState_Unoccupied)
+		{
+			if(GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1,15.f,FColor::Blue,TEXT("Pressed Equibutton pressed"));
+				ServerEquipButtonPressed();
+			}
+
+		}
 		if(!HasAuthority() && Combat->CombatState == ECombatState::ECState_Unoccupied && OverlappingWeapon == nullptr)
 		{
 			Combat->CombatState = ECombatState::ECState_SwapWeapons;
@@ -98,7 +116,15 @@ void ABMCharacter::ServerEquipButtonPressed_Implementation()
 	{
 		if(OverlappingWeapon)
 		{
-			Combat->EquipWeapon(OverlappingWeapon);
+			if(GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1,15.f,FColor::Blue,TEXT("Pressed ServerEquibutton pressed"));
+				Combat->EquipWeapon(OverlappingWeapon);
+			}
+		}
+		else if (Combat->bShouldSwapWeapon())
+		{
+			Combat->SwapWeapon();
 		}
 	}
 }

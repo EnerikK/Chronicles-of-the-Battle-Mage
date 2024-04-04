@@ -11,6 +11,7 @@
 #define TRACE 80000.f
 
 
+class ABMCharacterBase;
 class AWeapon;
 class ABMHud;
 class ABMPlayerController;
@@ -26,9 +27,10 @@ public:
 	friend ABMCharacter;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-
+	
 	void EquipWeapon(AWeapon* WeaponToEquip);
+	bool bShouldSwapWeapon();
+	void SwapWeapon();
 
 	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
@@ -61,11 +63,12 @@ private:
 
 	UPROPERTY()
 	ABMCharacter* Character;
+	
 	UPROPERTY()
 	ABMPlayerController* Controller;
+	
 	UPROPERTY()
 	ABMHud* Hud;
-
 	
 	UPROPERTY(ReplicatedUsing=OnRep_CombatState)
 	ECombatState CombatState = ECombatState::ECState_Unoccupied;

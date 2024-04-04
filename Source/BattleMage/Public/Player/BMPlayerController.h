@@ -23,7 +23,8 @@ class BATTLEMAGE_API ABMPlayerController : public APlayerController
 public:
 
 	ABMPlayerController();
-	virtual void PlayerTick(float DeltaTime) override;
+	virtual void Tick(float DeltaSeconds) override;
+	virtual void OnPossess(APawn* InPawn) override;
 
 protected:
 

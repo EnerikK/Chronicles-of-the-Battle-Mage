@@ -16,12 +16,10 @@ UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	
-
 }
 void UCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
 	
 }
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -30,9 +28,9 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 	if(Character && Character->IsLocallyControlled())
 	{
-		FHitResult HitResult;
+		/*FHitResult HitResult;
 		TraceUnderCrosshair(HitResult);
-		HitTarget = HitResult.ImpactPoint;
+		HitTarget = HitResult.ImpactPoint;*/
 		
 		SetHudCrosshair(DeltaTime);
 	}
@@ -50,6 +48,7 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 {
 	if(Character == nullptr || WeaponToEquip == nullptr) return;
 	if(CombatState != ECombatState::ECState_Unoccupied) return;
+
 	
 	if(EquippedWeapon != nullptr && SecondaryWeapon == nullptr)
 	{
@@ -59,7 +58,21 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	{
 		EquipPrimaryWeapon(WeaponToEquip);
 	}
+	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	Character->bUseControllerRotationYaw = true;
+
 }
+
+bool UCombatComponent::bShouldSwapWeapon()
+{
+	return (EquippedWeapon != nullptr && SecondaryWeapon != nullptr);
+}
+
+void UCombatComponent::SwapWeapon()
+{
+	
+}
+
 void UCombatComponent::TraceUnderCrosshair(FHitResult& TraceHitResult)
 {
 	FVector2D ViewportSize;
@@ -116,7 +129,7 @@ void UCombatComponent::SetHudCrosshair(float DeltaTime)
 		Hud = Hud == nullptr ? Cast<ABMHud>(Controller->GetHUD()) : Hud; //same
 		if(Hud)
 		{
-			if(Character)
+			if(EquippedWeapon)
 			{
 				HUDPackage.CrosshairCenter = EquippedWeapon->CrosshairCenter;
 				HUDPackage.CrosshairLeft = EquippedWeapon->CrosshairLeft;
