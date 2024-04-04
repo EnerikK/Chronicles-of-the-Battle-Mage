@@ -11,7 +11,7 @@
 
 AWeapon::AWeapon()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
@@ -22,9 +22,6 @@ AWeapon::AWeapon()
 	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	WeaponMesh->SetIsReplicated(true);
 	
-	WeaponMesh->SetCustomDepthStencilValue(250);
-	WeaponMesh->MarkRenderStateDirty();
-
 	PickUpSphere = CreateDefaultSubobject<USphereComponent>(TEXT("PickUpSphere"));
 	PickUpSphere->SetupAttachment(RootComponent);
 	PickUpSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -120,7 +117,6 @@ void AWeapon::OnEquipped()
 	WeaponMesh->SetSimulatePhysics(false);
 	WeaponMesh->SetEnableGravity(false);
 	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
 }
 
 void AWeapon::OnDropped()

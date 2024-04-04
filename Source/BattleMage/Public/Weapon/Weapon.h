@@ -24,10 +24,11 @@ enum class EWeaponState : uint8
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
-	EW_Sword      	UMETA(DisplayName = "Hit Scan Weapon"),
-	EW_Staff   		UMETA(DisplayName = "Projectile Weapon"),
-	EW_Daggers		UMETA(DisplayName = "Shotgun Weapon"),
-	EW_Hook			UMETA(DisplayName = "Shotgun Weapon"),
+	EW_Sword      	UMETA(DisplayName = "Sword"),
+	EW_Staff   		UMETA(DisplayName = "Staff"),
+	EW_Daggers		UMETA(DisplayName = "Daggers"),
+	EW_Spear		UMETA(DisplayName = "Spaer"),
+	EW_Hook			UMETA(DisplayName = "Hook"),
 	
 	EF_MAX			UMETA(DisplayName = "DefaultMAX")
 };
@@ -48,7 +49,7 @@ public:
 	void SetHudAmmo();
 
 	FORCEINLINE USphereComponent* GetPickUpSphere() const {return PickUpSphere;}
-
+	FORCEINLINE EWeaponType GetWeaponType() const {return WeaponType;}
 	
 	/*
 	* Texture for the cross-hairs
@@ -70,9 +71,6 @@ public:
 	/*
 	* Texture for the cross-hairs end
 	*/
-
-	UPROPERTY(EditAnywhere)
-	EWeaponType WeaponType;
 
 protected:
 
@@ -111,4 +109,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere,Category="Weapon Properties")
 	UWidgetComponent* PickUpWidget;
+
+	UPROPERTY(EditAnywhere)
+	EWeaponType WeaponType;
 };
