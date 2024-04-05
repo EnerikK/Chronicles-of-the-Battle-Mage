@@ -3,6 +3,9 @@
 #include "Player/BMPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "AbilitySystem/BMAbilitySystemComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "BMGameplayTags.h"
 #include "Character/BMCharacter.h"
 #include "GameFramework/Controller.h"
 #include "Components/InputComponent.h"
@@ -58,45 +61,37 @@ void ABMPlayerController::SetupInputComponent()
 
 void ABMPlayerController::CursorTrace()
 {
-	FHitResult CursorHit;
-	GetHitResultUnderCursor(ECC_Visibility,false,CursorHit);
+	if(GetASC() && GetASC()->HasMatchingGameplayTag(FBattleMageGameplayTags::Get().Player_Block_CursorTrace))
+	{
+		if(LastActor) LastActor->UnHighlight();
+		if(ThisActor) ThisActor->Highlight();
+		LastActor = nullptr;
+		ThisActor = nullptr;
+		return;
+		
+	}
+	LastActor = ThisActor;
+	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
+	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	if(!CursorHit.bBlockingHit) return;
 
-	LastActor = ThisActor;
+	if(LastActor != ThisActor)
+	{
+		if(LastActor) LastActor->UnHighlight();
+		if(ThisActor) ThisActor->Highlight();
+	}
+	
+	
+}
 
-	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
-	
-	if(LastActor == nullptr)
+UBMAbilitySystemComponent* ABMPlayerController::GetASC()
+{
+	if(AuraAbilitySystemComponent == nullptr)
 	{
-		if(ThisActor != nullptr)
-		{
-			ThisActor->Highlight();
-		}
-		else
-		{
-			// do nothing
-		}
+		AuraAbilitySystemComponent = Cast<UBMAbilitySystemComponent>
+		(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
 	}
-	else
-	{
-		if(ThisActor == nullptr)
-		{
-			LastActor->UnHighlight();
-		}
-		else
-		{
-			if(LastActor != ThisActor)
-			{
-				LastActor->UnHighlight();
-				ThisActor->Highlight();
-			}
-			else
-			{
-				// do nothing
-			}
-		}
-	}
-	
+	return AuraAbilitySystemComponent;
 }
 
 void ABMPlayerController::Move(const FInputActionValue& Value)
@@ -154,10 +149,6 @@ void ABMPlayerController::Equip(const FInputActionValue& Value)
 {
 	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
-		if(GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1,15.f,FColor::Red,TEXT("Pressed E"));
-			ControlledCharacter->EquipButtonPressed();
-		}
+		ControlledCharacter->EquipButtonPressed();
 	}
 }

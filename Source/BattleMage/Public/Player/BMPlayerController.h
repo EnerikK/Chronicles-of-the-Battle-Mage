@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "BMPlayerController.generated.h"
 
+class UBMAbilitySystemComponent;
 class IEnemyInterface;
 class UInputAction;
 class UInputMappingContext;
@@ -35,8 +36,14 @@ private:
 
 	void CursorTrace();
 
+	UBMAbilitySystemComponent* GetASC();
+
+	UPROPERTY()
+	TObjectPtr<UBMAbilitySystemComponent> AuraAbilitySystemComponent;
+
 	IEnemyInterface* LastActor;
 	IEnemyInterface* ThisActor;
+	FHitResult CursorHit;
 
 	UPROPERTY(EditAnywhere,Category="Input")
 	TObjectPtr<UInputMappingContext> BMContest;

@@ -8,7 +8,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Interaction/CombatComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/BMPlayerController.h"
 #include "Player/BMPlayerState.h"
 #include "Weapon/Weapon.h"
 
@@ -33,12 +35,31 @@ ABMCharacter::ABMCharacter()
 
 	Combat = CreateDefaultSubobject<UCombatComponent>("Combat");
 	Combat->SetIsReplicated(true);
-	
+
+	TurningInPlace = ETurnInPlace::ETurnIP_NotTurning;
 }
 void ABMCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	RotateInPlace(DeltaSeconds);
 }
+void ABMCharacter::RotateInPlace(float DeltaTime)
+{
+	if(Combat && Combat->EquippedWeapon)
+	{
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+		bUseControllerRotationYaw = true;
+	}
+	if(PlayerController)
+	{
+		bUseControllerRotationYaw = false;
+		TurningInPlace = ETurnInPlace::ETurnIP_NotTurning;
+		return;
+		
+	}
+	AimOffset(DeltaTime);
+}
+
 
 void ABMCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -90,12 +111,7 @@ void ABMCharacter::EquipButtonPressed()
 	{
 		if(Combat->CombatState == ECombatState::ECState_Unoccupied)
 		{
-			if(GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1,15.f,FColor::Blue,TEXT("Pressed Equibutton pressed"));
-				ServerEquipButtonPressed();
-			}
-
+			ServerEquipButtonPressed();
 		}
 		if(!HasAuthority() && Combat->CombatState == ECombatState::ECState_Unoccupied && OverlappingWeapon == nullptr)
 		{
@@ -104,10 +120,16 @@ void ABMCharacter::EquipButtonPressed()
 	}
 }
 
+
 AWeapon* ABMCharacter::GetEquippedWeapon()
 {
 	if(Combat == nullptr) return nullptr;
 	return Combat->EquippedWeapon;
+}
+
+bool ABMCharacter::IsWeaponEquipped()
+{
+	return (Combat && Combat->EquippedWeapon);
 }
 
 void ABMCharacter::ServerEquipButtonPressed_Implementation()
@@ -116,11 +138,7 @@ void ABMCharacter::ServerEquipButtonPressed_Implementation()
 	{
 		if(OverlappingWeapon)
 		{
-			if(GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1,15.f,FColor::Blue,TEXT("Pressed ServerEquibutton pressed"));
-				Combat->EquipWeapon(OverlappingWeapon);
-			}
+			Combat->EquipWeapon(OverlappingWeapon);
 		}
 		else if (Combat->bShouldSwapWeapon())
 		{
@@ -128,7 +146,6 @@ void ABMCharacter::ServerEquipButtonPressed_Implementation()
 		}
 	}
 }
-
 void ABMCharacter::InitAbilityActorInfo()
 {
 	ABMPlayerState* BattleMagePlayerState = GetPlayerState<ABMPlayerState>();
@@ -148,5 +165,66 @@ void ABMCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 	if(LastWeapon)
 	{
 		LastWeapon->ShowPickUpWidget(false);
+	}
+}
+void ABMCharacter::AimOffset(float DeltaTime)
+{
+	//There's a Bug on the Yaw when you use it on Multiplayer Fix when you can if  you can future me
+	if (Combat && Combat->EquippedWeapon == nullptr) return;
+	FVector Velocity = GetVelocity();
+	Velocity.Z = 0.f;
+	float Speed = Velocity.Size();
+	bool bIsInAir = GetCharacterMovement()->IsFalling();
+
+	if (Speed == 0.f && !bIsInAir) // standing still, not jumping
+	{
+		FRotator CurrentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
+		AO_Yaw = DeltaAimRotation.Yaw;
+		if(TurningInPlace == ETurnInPlace::ETurnIP_NotTurning)
+		{
+			InterpAO_Yaw = AO_Yaw;
+		}
+		bUseControllerRotationYaw = true;
+		TurnInPlace(DeltaTime);
+	}
+	if (Speed > 0.f || bIsInAir) // running, or jumping
+	{
+		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		AO_Yaw = 0.f;
+		bUseControllerRotationYaw = true;
+		TurningInPlace = ETurnInPlace::ETurnIP_NotTurning;
+	}
+	AO_Pitch = GetBaseAimRotation().Pitch;
+	if (AO_Pitch > 90.f && !IsLocallyControlled())
+	{
+		//found out that when i try to pitch downwards thepitch goes from 360 to 270 it should be 0 to -90 so we MAP pitch from [270,360) to [-90,0)
+		FVector2D InRange(270.f, 360.f);
+		FVector2D OutRange(-90.f, 0.f);
+		//Apply Correction
+		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
+	}
+}
+void ABMCharacter::TurnInPlace(float DeltaTime)
+{
+	UE_LOG(LogTemp,Warning,TEXT("AO_YAW : %f"),AO_Yaw);
+	if(AO_Yaw > 90.f)
+	{
+		TurningInPlace = ETurnInPlace::ETurnIP_Right;
+	}
+	else if (AO_Yaw < -90.f)
+	{
+		TurningInPlace = ETurnInPlace::ETurnIP_Left;
+	}
+	if(TurningInPlace != ETurnInPlace::ETurnIP_NotTurning)
+	{
+		InterpAO_Yaw = FMath::FInterpTo(InterpAO_Yaw,0.f,DeltaTime,4.f);
+		AO_Yaw = InterpAO_Yaw;
+		if(FMath::Abs(AO_Yaw) < 15.f)
+		{
+			TurningInPlace = ETurnInPlace::ETurnIP_NotTurning;
+			StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+			
+		}
 	}
 }

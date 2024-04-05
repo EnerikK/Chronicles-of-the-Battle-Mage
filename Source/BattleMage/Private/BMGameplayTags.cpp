@@ -45,4 +45,13 @@ void FBattleMageGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatSocket_LeftHand = UGameplayTagsManager::Get().AddNativeGameplayTag
 	(FName("CombatSocket.LeftHand"),
 	FString("LeftHand Attacks"));
+	
+	/*
+	* Player Tags
+	*/
+	GameplayTags.Player_Block_CursorTrace = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("Player.Block.CursorTrace"),
+	FString("Block The trace under the cursor"));
+
+	
 }

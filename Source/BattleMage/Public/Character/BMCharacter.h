@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/BMCharacterBase.h"
 #include "HUD/BMHud.h"
+#include "Types/TurnInPlace.h"
 #include "BMCharacter.generated.h"
 
 class AWeapon;
@@ -34,8 +35,18 @@ public:
 	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	void EquipButtonPressed();
+
+	void RotateInPlace(float DeltaTime);
+
 	
 	AWeapon* GetEquippedWeapon();
+	bool IsWeaponEquipped();
+
+	FORCEINLINE float GetAO_Yaw() const {return AO_Yaw;}
+	FORCEINLINE float GetAO_Pitch() const {return  AO_Pitch;}
+	FORCEINLINE ETurnInPlace GetTurningInPlace() const {return TurningInPlace;}
+
+
 
 protected:
 
@@ -48,6 +59,9 @@ protected:
 	UPROPERTY()
 	ABMHud* Hud;
 
+	void AimOffset(float DeltaTime);
+
+
 private:
 	
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,meta = (AllowPrivateAccess = true))
@@ -55,7 +69,6 @@ private:
 
 	UFUNCTION(Server,Reliable)
 	void ServerEquipButtonPressed();
-
 	
 	virtual void InitAbilityActorInfo() override;
 
@@ -70,5 +83,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> CameraBoom;
+
+	ETurnInPlace TurningInPlace;
+	void TurnInPlace(float DeltaTime);
+
+	float AO_Yaw;
+	float InterpAO_Yaw;
+	float AO_Pitch;
+	FRotator StartingAimRotation;
 	
 };
