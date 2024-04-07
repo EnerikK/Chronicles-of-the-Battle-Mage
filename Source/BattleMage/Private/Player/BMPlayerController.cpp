@@ -80,8 +80,6 @@ void ABMPlayerController::CursorTrace()
 		if(LastActor) LastActor->UnHighlight();
 		if(ThisActor) ThisActor->Highlight();
 	}
-	
-	
 }
 
 UBMAbilitySystemComponent* ABMPlayerController::GetASC()
@@ -114,9 +112,7 @@ void ABMPlayerController::Move(const FInputActionValue& Value)
 			ControlledPawn->AddMovementInput(Direction,MoveValue.X);
 		}
 	}
-	
 }
-
 void ABMPlayerController::Look(const FInputActionValue& Value)
 {
 	APawn* ControlledPawn = GetPawn<APawn>();

@@ -75,6 +75,9 @@ private:
 	
 	UFUNCTION()
 	void OnRep_CombatState();
+
+	UPROPERTY(EditAnywhere)
+	float BaseWalkSpeed;
 	
 	FVector HitTarget;
 

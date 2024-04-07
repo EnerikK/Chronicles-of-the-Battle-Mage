@@ -27,6 +27,9 @@ public:
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	/*CombatInterface End*/
+
+	FOnASCRegistered OnAscRegistered;
+
 	
 protected:
 	
@@ -38,7 +41,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 	
-
 	UPROPERTY(EditAnywhere,Category="Combat")
 	FName WeaponTipSocketName;
 

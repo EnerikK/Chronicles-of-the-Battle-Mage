@@ -8,10 +8,12 @@
 
 UBMAttributeSet::UBMAttributeSet()
 {
-	InitHealth(100.f);
-	InitMaxHealth(100.f);
-	InitMana(50.f);
-	InitMaxMana(50.f);
+	InitHealth(150.f);
+	InitMaxHealth(200.f);
+	InitMana(80.f);
+	InitMaxMana(200.f);
+	InitStamina(100.f);
+	InitMaxStamina(200.f);
 }
 
 void UBMAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -20,6 +22,10 @@ void UBMAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UBMAttributeSet,Health,COND_None,REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBMAttributeSet,MaxHealth,COND_None,REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBMAttributeSet,Mana,COND_None,REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBMAttributeSet,MaxMana,COND_None,REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBMAttributeSet,Stamina,COND_None,REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBMAttributeSet,MaxStamina,COND_None,REPNOTIFY_Always);
 }
 
 void UBMAttributeSet::OnRep_Health(const FGameplayAttributeData& oldHealth)
@@ -43,4 +49,15 @@ void UBMAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& oldMaxMana)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,MaxMana,oldMaxMana);
 
+}
+
+void UBMAttributeSet::OnRep_Stamina(const FGameplayAttributeData& oldStamina)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,Stamina,oldStamina);
+
+}
+
+void UBMAttributeSet::OnRep_MaxStamina(const FGameplayAttributeData& oldMaxStamina)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,MaxStamina,oldMaxStamina);
 }

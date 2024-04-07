@@ -34,13 +34,13 @@ protected:
 
 private:
 
-	void CursorTrace();
 
 	UBMAbilitySystemComponent* GetASC();
 
 	UPROPERTY()
 	TObjectPtr<UBMAbilitySystemComponent> AuraAbilitySystemComponent;
 
+	void CursorTrace();
 	IEnemyInterface* LastActor;
 	IEnemyInterface* ThisActor;
 	FHitResult CursorHit;

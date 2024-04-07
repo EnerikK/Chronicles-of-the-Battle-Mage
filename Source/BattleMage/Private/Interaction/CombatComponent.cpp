@@ -16,10 +16,16 @@ UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	
+	BaseWalkSpeed = 600.f;
+	
 }
 void UCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	if(Character)
+	{
+		Character->GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+	}
 	
 }
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

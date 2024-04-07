@@ -154,6 +154,15 @@ void ABMCharacter::InitAbilityActorInfo()
 	BattleMagePlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(BattleMagePlayerState,this);
 	AbilitySystemComponent = BattleMagePlayerState->GetAbilitySystemComponent();AttributeSet = BattleMagePlayerState->GetAttributeSet();
 	AttributeSet = BattleMagePlayerState->GetAttributeSet();
+
+	OnAscRegistered.Broadcast(AbilitySystemComponent);
+	if(ABMPlayerController* BattleMagePlayerController = Cast<ABMPlayerController>(GetController()))
+	{
+		if(ABMHud* BattleMageHud = Cast<ABMHud>(BattleMagePlayerController->GetHUD()))
+		{
+			BattleMageHud->InitOverlay(BattleMagePlayerController,BattleMagePlayerState,AbilitySystemComponent,AttributeSet);
+		}
+	}
 }
 
 void ABMCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)

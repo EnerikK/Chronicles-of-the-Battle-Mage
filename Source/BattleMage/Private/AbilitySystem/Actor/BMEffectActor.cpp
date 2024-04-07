@@ -18,7 +18,6 @@ ABMEffectActor::ABMEffectActor()
 	Sphere->SetupAttachment(GetRootComponent());
 	
 }
-
 void ABMEffectActor::BeginPlay()
 {
 	Super::BeginPlay();
@@ -26,8 +25,6 @@ void ABMEffectActor::BeginPlay()
 	Sphere->OnComponentEndOverlap.AddDynamic(this, &ABMEffectActor::EndOverlap);
 	
 }
-
-
 void ABMEffectActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -37,10 +34,11 @@ void ABMEffectActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 
 		UBMAttributeSet* MutableAuraAttributeSet = const_cast<UBMAttributeSet*>(AuraAttributeSet);
 		MutableAuraAttributeSet->SetHealth(AuraAttributeSet->GetHealth() + 25.f);
+		MutableAuraAttributeSet->SetStamina(AuraAttributeSet->GetStamina() + 50.f);
+		MutableAuraAttributeSet->SetMana(AuraAttributeSet->GetMana() + 50.f);
 		Destroy();
 	}
 }
-
 void ABMEffectActor::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {

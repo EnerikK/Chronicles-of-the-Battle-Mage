@@ -63,7 +63,6 @@ void ABMCharacterBase::InitAbilityActorInfo()
 	Cast<UBMAbilitySystemComponent>(BattleMagePlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 	AbilitySystemComponent = BattleMagePlayerState->GetAbilitySystemComponent();
 	AttributeSet = BattleMagePlayerState->GetAttributeSet();
-	
 }
 
 

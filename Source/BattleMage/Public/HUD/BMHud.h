@@ -6,6 +6,10 @@
 #include "GameFramework/HUD.h"
 #include "BMHud.generated.h"
 
+struct FWidgetControllerParams;
+class UOverlayWidgetController;
+class UAbilitySystemComponent;
+class UAttributeSet;
 class UBMUserWidget;
 
 USTRUCT(BlueprintType)
@@ -38,10 +42,17 @@ public:
 	
 	UPROPERTY()
 	TObjectPtr<UBMUserWidget> OverlayWidget;
+	
+	void InitOverlay(APlayerController* PC , APlayerState* PS , UAbilitySystemComponent* ASC , UAttributeSet* AS);
+
+	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
+
+
 
 	virtual void DrawHUD() override;
 	
 	FORCEINLINE void SetHudPackage(const FHUDPackage& Package) {HudPackage = Package;}
+
 
 
 protected:
@@ -61,6 +72,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> OverlayWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<UOverlayWidgetController> OverlayWidgetController;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UOverlayWidgetController> OverlayWidgetControllerClass;
 	
 	
 };

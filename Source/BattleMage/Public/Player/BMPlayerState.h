@@ -10,6 +10,9 @@
 class ABMPlayerController;
 class UAbilitySystemComponent;
 class UAttributeSet;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChanged,int32 /*StatValue*/)
+
 /**
  * 
  */
@@ -23,6 +26,11 @@ public:
 	ABMPlayerState();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const {return AttributeSet;}
+
+	FOnPlayerStatChanged OnXPChangedDelegate;
+	FOnPlayerStatChanged OnLevelChangedDelegate;
+	FOnPlayerStatChanged OnAttributePointsChangedDelegate;
+	FOnPlayerStatChanged OnSpellPointsChangedDelegate;
 	
 
 protected:

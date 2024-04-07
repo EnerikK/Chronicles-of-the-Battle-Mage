@@ -35,7 +35,6 @@ void UBMAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsCrouched = Character->bIsCrouched;
 	TurnInPlace = Character->GetTurningInPlace();
 	
-
 	//OffSet for strafing
 	FRotator AimRotation = Character->GetBaseAimRotation();
 	FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(Character->GetVelocity());
