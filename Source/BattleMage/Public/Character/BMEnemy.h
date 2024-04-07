@@ -16,7 +16,7 @@ class BATTLEMAGE_API ABMEnemy : public ABMCharacterBase , public IEnemyInterface
 	GENERATED_BODY()
 
 public:
-	ABMEnemy();
+	ABMEnemy(const FObjectInitializer& ObjectInitializer);
 
 	/*EnemyInterface*/
 	virtual void Highlight() override;

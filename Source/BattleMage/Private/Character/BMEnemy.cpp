@@ -7,7 +7,9 @@
 #include "AbilitySystem/BMAttributeSet.h"
 #include "BattleMage/BattleMage.h"
 
-ABMEnemy::ABMEnemy()
+ABMEnemy::ABMEnemy(const FObjectInitializer& ObjectInitializer)
+:Super(ObjectInitializer.SetDefaultSubobjectClass<UBmCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
+
 {
 	AbilitySystemComponent = CreateDefaultSubobject<UBMAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);

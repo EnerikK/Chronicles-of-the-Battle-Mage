@@ -4,6 +4,7 @@
 #include "Character/BMCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Character/BMCharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -14,8 +15,11 @@
 #include "Player/BMPlayerState.h"
 #include "Weapon/Weapon.h"
 
-ABMCharacter::ABMCharacter()
+ABMCharacter::ABMCharacter(const FObjectInitializer& ObjectInitializer)
+:Super(ObjectInitializer.SetDefaultSubobjectClass<UBmCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
+
 {
+	
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoom");
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->bDoCollisionTest = false;

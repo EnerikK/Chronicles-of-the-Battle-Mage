@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "BMCharacterMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
 #include "BMCharacterBase.generated.h"
@@ -17,8 +18,11 @@ class BATTLEMAGE_API ABMCharacterBase : public ACharacter , public IAbilitySyste
 	GENERATED_BODY()
 
 public:
-	ABMCharacterBase();
+	ABMCharacterBase(const FObjectInitializer& ObjectInitializer);
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(BlueprintReadOnly,EditDefaultsOnly,Category=Movement)
+	UBmCharacterMovementComponent* BMCharacterMovementComponent;
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* Attributes() const {return AttributeSet;}

@@ -6,12 +6,18 @@
 #include "AbilitySystemComponent.h"
 #include "BMGameplayTags.h"
 #include "AbilitySystem/BMAbilitySystemComponent.h"
+#include "Character/BMCharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BMPlayerState.h"
 
-ABMCharacterBase::ABMCharacterBase()
+class UBmCharacterMovementComponent;
+
+ABMCharacterBase::ABMCharacterBase(const FObjectInitializer& ObjectInitializer)
+:Super(ObjectInitializer.SetDefaultSubobjectClass<UBmCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	BMCharacterMovementComponent = Cast<UBmCharacterMovementComponent>(GetCharacterMovement());
 
 	const FBattleMageGameplayTags& GameplayTags = FBattleMageGameplayTags::Get();
 	

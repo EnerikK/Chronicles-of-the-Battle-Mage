@@ -8,6 +8,7 @@
 #include "Types/TurnInPlace.h"
 #include "BMCharacter.generated.h"
 
+class UBmCharacterMovementComponent;
 class AWeapon;
 class ABMPlayerController;
 class UCombatComponent;
@@ -25,8 +26,8 @@ class BATTLEMAGE_API ABMCharacter : public ABMCharacterBase
 
 public:
 
-	ABMCharacter();
-
+	ABMCharacter(const FObjectInitializer& ObjectInitializer);
+	
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PossessedBy(AController* NewController) override;
@@ -49,6 +50,8 @@ public:
 
 
 protected:
+
+
 
 	UPROPERTY()
 	ABMPlayerController* PlayerController;

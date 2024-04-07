@@ -7,6 +7,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "BMGameplayTags.h"
 #include "Character/BMCharacter.h"
+#include "Character/BMCharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/Character.h"
@@ -55,6 +56,10 @@ void ABMPlayerController::SetupInputComponent()
 		JumpAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Jump);
 	EnhancedInputComponent->BindAction(
 		EquipAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Equip);
+	EnhancedInputComponent->BindAction(
+	ShiftPressed,ETriggerEvent::Started,this,&ABMPlayerController::StartSprint);
+	EnhancedInputComponent->BindAction(
+	ShiftPressed,ETriggerEvent::Completed,this,&ABMPlayerController::StopSprint);
 	
 	
 }
@@ -146,5 +151,21 @@ void ABMPlayerController::Equip(const FInputActionValue& Value)
 	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
 		ControlledCharacter->EquipButtonPressed();
+	}
+}
+
+void ABMPlayerController::StartSprint(const FInputActionValue& Value)
+{
+	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
+	{
+		ControlledCharacter->BMCharacterMovementComponent->SprintPressed();
+	}
+}
+
+void ABMPlayerController::StopSprint(const FInputActionValue& Value)
+{
+	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
+	{
+		ControlledCharacter->BMCharacterMovementComponent->SprintReleased();
 	}
 }
