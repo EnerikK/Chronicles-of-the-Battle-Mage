@@ -38,7 +38,6 @@ public:
 	void EquipButtonPressed();
 
 	void RotateInPlace(float DeltaTime);
-
 	
 	AWeapon* GetEquippedWeapon();
 	bool IsWeaponEquipped();
@@ -46,13 +45,10 @@ public:
 	FORCEINLINE float GetAO_Yaw() const {return AO_Yaw;}
 	FORCEINLINE float GetAO_Pitch() const {return  AO_Pitch;}
 	FORCEINLINE ETurnInPlace GetTurningInPlace() const {return TurningInPlace;}
-
-
+	FORCEINLINE UBmCharacterMovementComponent* GetBMCharacterComponent() const {return BMCharacterMovementComponent;}
 
 protected:
-
-
-
+	
 	UPROPERTY()
 	ABMPlayerController* PlayerController;
 	
@@ -66,6 +62,9 @@ protected:
 
 
 private:
+
+	UPROPERTY(BlueprintReadOnly,EditDefaultsOnly,Category=Movement,meta=(AllowPrivateAccess = true))
+	UBmCharacterMovementComponent* BMCharacterMovementComponent;
 	
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,meta = (AllowPrivateAccess = true))
 	UCombatComponent* Combat;

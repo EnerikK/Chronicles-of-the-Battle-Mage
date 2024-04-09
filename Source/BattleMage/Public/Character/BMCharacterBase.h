@@ -20,10 +20,7 @@ class BATTLEMAGE_API ABMCharacterBase : public ACharacter , public IAbilitySyste
 public:
 	ABMCharacterBase(const FObjectInitializer& ObjectInitializer);
 	virtual void Tick(float DeltaTime) override;
-
-	UPROPERTY(BlueprintReadOnly,EditDefaultsOnly,Category=Movement)
-	UBmCharacterMovementComponent* BMCharacterMovementComponent;
-
+	
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* Attributes() const {return AttributeSet;}
 

@@ -16,9 +16,7 @@ ABMCharacterBase::ABMCharacterBase(const FObjectInitializer& ObjectInitializer)
 :Super(ObjectInitializer.SetDefaultSubobjectClass<UBmCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	BMCharacterMovementComponent = Cast<UBmCharacterMovementComponent>(GetCharacterMovement());
-
+	
 	const FBattleMageGameplayTags& GameplayTags = FBattleMageGameplayTags::Get();
 	
 }

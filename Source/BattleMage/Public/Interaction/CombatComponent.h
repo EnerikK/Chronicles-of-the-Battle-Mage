@@ -22,7 +22,7 @@ class BATTLEMAGE_API UCombatComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	UCombatComponent();
 	friend ABMCharacter;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -31,7 +31,6 @@ public:
 	void EquipWeapon(AWeapon* WeaponToEquip);
 	bool bShouldSwapWeapon();
 	void SwapWeapon();
-
 	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;

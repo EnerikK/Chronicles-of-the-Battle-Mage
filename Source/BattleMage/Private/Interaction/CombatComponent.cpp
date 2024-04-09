@@ -54,7 +54,6 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 {
 	if(Character == nullptr || WeaponToEquip == nullptr) return;
 	if(CombatState != ECombatState::ECState_Unoccupied) return;
-
 	
 	if(EquippedWeapon != nullptr && SecondaryWeapon == nullptr)
 	{
@@ -64,8 +63,7 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	{
 		EquipPrimaryWeapon(WeaponToEquip);
 	}
-	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
-	Character->bUseControllerRotationYaw = true;
+	Character->GetCharacterMovement()->bOrientRotationToMovement = true;
 
 }
 
@@ -169,8 +167,6 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		EquippedWeapon->SetWeaponState(EWeaponState::EW_Equipped);
 		AttachActorToRightHand(EquippedWeapon);
 		
-		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
-		Character->bUseControllerRotationYaw = true;
 	}
 }
 void UCombatComponent::AttachActorToLeftHand(AActor* ActorToAttach)

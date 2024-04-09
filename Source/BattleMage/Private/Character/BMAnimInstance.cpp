@@ -28,8 +28,8 @@ void UBMAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Velocity.Z = 0.f;
 	Speed = Velocity.Size();
 
-	bIsInAir = Character->BMCharacterMovementComponent->IsFalling();
-	bIsAccelerating = Character->BMCharacterMovementComponent->GetCurrentAcceleration().Size() > 0.f ? true : false;
+	bIsInAir = Character->GetBMCharacterComponent()->IsFalling();
+	bIsAccelerating = Character->GetBMCharacterComponent()->GetCurrentAcceleration().Size() > 0.f ? true : false;
 	bWeaponEquipped = Character->IsWeaponEquipped();
 	EquippedWeapon = Character->GetEquippedWeapon();
 	bIsCrouched = Character->bIsCrouched;

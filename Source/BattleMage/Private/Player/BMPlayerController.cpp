@@ -60,6 +60,8 @@ void ABMPlayerController::SetupInputComponent()
 	ShiftPressed,ETriggerEvent::Started,this,&ABMPlayerController::StartSprint);
 	EnhancedInputComponent->BindAction(
 	ShiftPressed,ETriggerEvent::Completed,this,&ABMPlayerController::StopSprint);
+	EnhancedInputComponent->BindAction(
+	CrouchAction,ETriggerEvent::Completed,this,&ABMPlayerController::Crouch);
 	
 	
 }
@@ -158,7 +160,7 @@ void ABMPlayerController::StartSprint(const FInputActionValue& Value)
 {
 	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
-		ControlledCharacter->BMCharacterMovementComponent->SprintPressed();
+		ControlledCharacter->GetBMCharacterComponent()->SprintPressed();
 	}
 }
 
@@ -166,6 +168,13 @@ void ABMPlayerController::StopSprint(const FInputActionValue& Value)
 {
 	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
-		ControlledCharacter->BMCharacterMovementComponent->SprintReleased();
+		ControlledCharacter->GetBMCharacterComponent()->SprintReleased();
+	}
+}
+void ABMPlayerController::Crouch(const FInputActionValue& Value)
+{
+	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
+	{
+		ControlledCharacter->GetBMCharacterComponent()->CrouchPressed();
 	}
 }

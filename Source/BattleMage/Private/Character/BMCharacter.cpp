@@ -19,7 +19,6 @@ ABMCharacter::ABMCharacter(const FObjectInitializer& ObjectInitializer)
 :Super(ObjectInitializer.SetDefaultSubobjectClass<UBmCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 
 {
-	
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoom");
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->bDoCollisionTest = false;
@@ -37,6 +36,8 @@ ABMCharacter::ABMCharacter(const FObjectInitializer& ObjectInitializer)
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
 
+	BMCharacterMovementComponent = Cast<UBmCharacterMovementComponent>(GetCharacterMovement());
+	
 	Combat = CreateDefaultSubobject<UCombatComponent>("Combat");
 	Combat->SetIsReplicated(true);
 
@@ -51,8 +52,8 @@ void ABMCharacter::RotateInPlace(float DeltaTime)
 {
 	if(Combat && Combat->EquippedWeapon)
 	{
-		GetCharacterMovement()->bOrientRotationToMovement = false;
-		bUseControllerRotationYaw = true;
+		/*GetCharacterMovement()->bOrientRotationToMovement = false;
+		bUseControllerRotationYaw = true;*/
 	}
 	if(PlayerController)
 	{
@@ -198,14 +199,14 @@ void ABMCharacter::AimOffset(float DeltaTime)
 		{
 			InterpAO_Yaw = AO_Yaw;
 		}
-		bUseControllerRotationYaw = true;
+		bUseControllerRotationYaw = false;
 		TurnInPlace(DeltaTime);
 	}
 	if (Speed > 0.f || bIsInAir) // running, or jumping
 	{
 		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		AO_Yaw = 0.f;
-		bUseControllerRotationYaw = true;
+		bUseControllerRotationYaw = false;
 		TurningInPlace = ETurnInPlace::ETurnIP_NotTurning;
 	}
 	AO_Pitch = GetBaseAimRotation().Pitch;
