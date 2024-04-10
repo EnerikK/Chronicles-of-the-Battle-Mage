@@ -6,6 +6,7 @@
 #include "Character/BMCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Player/BMPlayerController.h"
 
 void UBMAnimInstance::NativeInitializeAnimation()
 {
@@ -27,7 +28,8 @@ void UBMAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	FVector Velocity = Character->GetVelocity();
 	Velocity.Z = 0.f;
 	Speed = Velocity.Size();
-
+	bCrouch = Character->IsCrouching();
+	bSlide = Character->IsSliding();
 	bIsInAir = Character->GetBMCharacterComponent()->IsFalling();
 	bIsAccelerating = Character->GetBMCharacterComponent()->GetCurrentAcceleration().Size() > 0.f ? true : false;
 	bWeaponEquipped = Character->IsWeaponEquipped();

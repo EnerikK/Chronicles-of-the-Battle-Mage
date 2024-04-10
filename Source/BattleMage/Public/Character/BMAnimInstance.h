@@ -7,6 +7,8 @@
 #include "Types/TurnInPlace.h"
 #include "BMAnimInstance.generated.h"
 
+class ABMPlayerController;
+class UBmCharacterMovementComponent;
 class AWeapon;
 class ABMCharacter;
 /**
@@ -27,6 +29,10 @@ private:
 	UPROPERTY()
 	AWeapon* EquippedWeapon;
 
+	UPROPERTY()
+	ABMPlayerController* PlayerController;
+
+	
 	UPROPERTY(BlueprintReadOnly,Category="Character",meta=(AllowPrivateAccess = "true"))
 	ABMCharacter* Character;
 
@@ -35,6 +41,12 @@ private:
 
 	UPROPERTY(BlueprintReadOnly,Category="Character",meta=(AllowPrivateAccess = "true"))
 	bool bIsInAir;
+
+	UPROPERTY(BlueprintReadOnly,Category="Character",meta=(AllowPrivateAccess = "true"))
+	bool bSlide;
+
+	UPROPERTY(BlueprintReadOnly,Category="Character",meta=(AllowPrivateAccess = "true"))
+	bool bCrouch;
 
 	UPROPERTY(BlueprintReadOnly,Category="Character",meta=(AllowPrivateAccess = "true"))
 	bool bIsAccelerating;

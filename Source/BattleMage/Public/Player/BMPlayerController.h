@@ -65,6 +65,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> CrouchAction;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> SlideAction;
+	
 	
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -73,5 +77,7 @@ private:
 	void StartSprint(const FInputActionValue& Value);
 	void StopSprint(const FInputActionValue& Value);
 	void Crouch(const FInputActionValue& Value);
+	void Slide(const FInputActionValue& Value);
+	void SlideReleased(const FInputActionValue& Value);
 	
 };

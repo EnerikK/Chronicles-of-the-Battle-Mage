@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BMAnimInstance.h"
 #include "Character/BMCharacterBase.h"
 #include "HUD/BMHud.h"
 #include "Types/TurnInPlace.h"
@@ -36,11 +37,20 @@ public:
 	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	void EquipButtonPressed();
-
+	
 	void RotateInPlace(float DeltaTime);
 	
 	AWeapon* GetEquippedWeapon();
 	bool IsWeaponEquipped();
+
+	bool IsCrouching();
+	bool IsSliding();
+
+	UPROPERTY()
+	FSlideStartDelegate SlideStartDelegate;
+	
+	UPROPERTY(EditAnywhere , Category= "Combat")
+	UAnimMontage* SlideMontage;
 
 	FORCEINLINE float GetAO_Yaw() const {return AO_Yaw;}
 	FORCEINLINE float GetAO_Pitch() const {return  AO_Pitch;}
@@ -58,13 +68,14 @@ protected:
 	UPROPERTY()
 	ABMHud* Hud;
 
-	void AimOffset(float DeltaTime);
-
-
-private:
-
 	UPROPERTY(BlueprintReadOnly,EditDefaultsOnly,Category=Movement,meta=(AllowPrivateAccess = true))
 	UBmCharacterMovementComponent* BMCharacterMovementComponent;
+
+	virtual void BeginPlay() override;
+
+	void AimOffset(float DeltaTime);
+
+private:
 	
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,meta = (AllowPrivateAccess = true))
 	UCombatComponent* Combat;

@@ -8,6 +8,8 @@
 
 class ABMCharacter;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSlideStartDelegate);
+
 UENUM()
 enum EMovementModeBattleMage
 {
@@ -32,7 +34,6 @@ class BATTLEMAGE_API UBmCharacterMovementComponent : public UCharacterMovementCo
 
 		/*Flag*/
 		uint8 Saved_bWantsToSprint : 1;
-		
 		uint8 Saved_bWantsToSlide : 1;
 
 	public:
@@ -60,24 +61,33 @@ class BATTLEMAGE_API UBmCharacterMovementComponent : public UCharacterMovementCo
 	UPROPERTY(EditDefaultsOnly)
 	float Walk_MaxWalkSpeed;
 	
-	bool bWantsToSprint;
-	bool bPrev_WantsToCrouch;
-	bool bWantsToSlide;
-	
 	/*Slide*/
 	UPROPERTY(EditDefaultsOnly)
 	float Slide_MinSpeed = 350;
 	UPROPERTY(EditDefaultsOnly)
-	float Slide_EnterImpulse = 500;
+	float Slide_EnterImpulse = 10;
 	UPROPERTY(EditDefaultsOnly)
 	float Slide_GravityForce = 5000;
 	UPROPERTY(EditDefaultsOnly)
 	float Slide_Friction = 1.3;
+	UPROPERTY(EditDefaultsOnly)
+	float Slide_CooldownDuration = 1.3;
+	UPROPERTY(EditDefaultsOnly)
+	float AuthSlideCooldownDuration= 3.9f;
 
 	UPROPERTY(Transient)
 	ABMCharacter* PlayerCharacter;
-	
 
+	bool bWantsToSprint;
+	bool bPrev_WantsToCrouch;
+	bool bWantsToSlide;
+
+	FTimerHandle TimerHandle_SlideCooldown;
+
+	float SlideStartTime;
+	
+	UPROPERTY(BlueprintAssignable)
+	FSlideStartDelegate SlideStartDelegate;
 
 public:
 
@@ -86,6 +96,8 @@ public:
 	virtual bool IsMovingOnGround() const override;
 	virtual bool CanCrouchInCurrentState() const override;
 
+	FORCEINLINE bool IsSliding() const {return IsCustomMovementMode(BMove_Slide);}
+	
 	UFUNCTION()
 	void SprintPressed();
 
@@ -99,6 +111,9 @@ public:
 	void SlidePressed();
 
 	UFUNCTION()
+	void SlideReleased();
+	
+	UFUNCTION()
 	bool IsCustomMovementMode(EMovementModeBattleMage InCustomMovementMode) const;
 
 protected:
@@ -106,15 +121,20 @@ protected:
 	virtual void InitializeComponent() override;
 	virtual void UpdateFromCompressedFlags(uint8 Flags) override;
 	virtual void OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity) override;
-	virtual void UpdateCharacterStateBeforeMovement(float DeltaSeconds) override;
 	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
+	virtual void UpdateCharacterStateBeforeMovement(float DeltaSeconds) override;
+	
 
 private:
 
-	/*Slide*/
+	void OnSlideCooldownFinished();
+	bool CanSlide() const;
+	void PerformSlide();
+
 	void EnterSlide();
 	void ExitSlide();
-	void PhysSlide(float DeltaTime,int32 It);
-	bool GetSlideSurface(FHitResult& Hit)const;
+	void PhysSlide(float deltaTime, int32 Iterations);
+	bool GetSlideSurface(FHitResult& Hit) const;
+
 	
 };

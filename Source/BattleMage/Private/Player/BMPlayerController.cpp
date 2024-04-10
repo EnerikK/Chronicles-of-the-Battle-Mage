@@ -40,6 +40,7 @@ void ABMPlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(BMContest,0);
 	}
+	
 }
 
 void ABMPlayerController::SetupInputComponent()
@@ -57,13 +58,15 @@ void ABMPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(
 		EquipAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Equip);
 	EnhancedInputComponent->BindAction(
-	ShiftPressed,ETriggerEvent::Started,this,&ABMPlayerController::StartSprint);
+		ShiftPressed,ETriggerEvent::Started,this,&ABMPlayerController::StartSprint);
 	EnhancedInputComponent->BindAction(
-	ShiftPressed,ETriggerEvent::Completed,this,&ABMPlayerController::StopSprint);
+		ShiftPressed,ETriggerEvent::Completed,this,&ABMPlayerController::StopSprint);
 	EnhancedInputComponent->BindAction(
-	CrouchAction,ETriggerEvent::Completed,this,&ABMPlayerController::Crouch);
-	
-	
+		CrouchAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Crouch);
+	EnhancedInputComponent->BindAction(
+		SlideAction,ETriggerEvent::Started,this,&ABMPlayerController::Slide);
+	EnhancedInputComponent->BindAction(
+		SlideAction,ETriggerEvent::Completed,this,&ABMPlayerController::SlideReleased);
 }
 
 void ABMPlayerController::CursorTrace()
@@ -176,5 +179,24 @@ void ABMPlayerController::Crouch(const FInputActionValue& Value)
 	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
 		ControlledCharacter->GetBMCharacterComponent()->CrouchPressed();
+		UE_LOG(LogTemp,Error,TEXT("Pressed Crouch"));
 	}
 }
+
+void ABMPlayerController::Slide(const FInputActionValue& Value)
+{
+	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
+	{
+		ControlledCharacter->GetBMCharacterComponent()->SlidePressed();
+	}
+}
+
+void ABMPlayerController::SlideReleased(const FInputActionValue& Value)
+{
+	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
+	{
+		ControlledCharacter->GetBMCharacterComponent()->SlideReleased();
+	}
+}
+
+

@@ -2,7 +2,6 @@
 
 
 #include "Character/BMCharacterMovementComponent.h"
-
 #include "Character/BMCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
@@ -25,11 +24,28 @@ void UBmCharacterMovementComponent::SprintReleased()
 
 void UBmCharacterMovementComponent::CrouchPressed()
 {
-	bWantsToCrouch = !bWantsToCrouch;
+	 bWantsToCrouch = !bWantsToCrouch;
 }
 
 void UBmCharacterMovementComponent::SlidePressed()
 {
+	float CurrentTime = GetWorld()->GetTimeSeconds();
+	if(CurrentTime - SlideStartTime >= Slide_CooldownDuration)
+	{
+		bWantsToSlide = true;
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimer
+		(TimerHandle_SlideCooldown,this,
+		&UBmCharacterMovementComponent::OnSlideCooldownFinished,Slide_CooldownDuration - (CurrentTime - SlideStartTime));
+	}
+}
+
+void UBmCharacterMovementComponent::SlideReleased()
+{
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_SlideCooldown);
+	bWantsToSlide = false;
 }
 
 bool UBmCharacterMovementComponent::IsCustomMovementMode(EMovementModeBattleMage InCustomMovementMode) const
@@ -52,6 +68,10 @@ bool UBmCharacterMovementComponent::FSavedMove_BattleMage::CanCombineWith(const 
 	{
 		return false;
 	}
+	if(Saved_bWantsToSlide != NewBattleMageMove->Saved_bWantsToSlide)
+	{
+		return false;
+	}
 	
 	return FSavedMove_Character::CanCombineWith(NewMove, InCharacter, MaxDelta);
 }
@@ -61,12 +81,14 @@ void UBmCharacterMovementComponent::FSavedMove_BattleMage::Clear()
 	FSavedMove_Character::Clear();
 	
 	Saved_bWantsToSprint = 0;
+	Saved_bWantsToSlide = 0;
 }
 
 uint8 UBmCharacterMovementComponent::FSavedMove_BattleMage::GetCompressedFlags() const
 {
 	uint8 Result = Super::GetCompressedFlags();
 	if(Saved_bWantsToSprint)  Result |= FLAG_Custom_0;
+	if(Saved_bWantsToSlide) Result |= FLAG_Custom_1;
 	return  Result;
 
 }
@@ -110,10 +132,22 @@ FNetworkPredictionData_Client* UBmCharacterMovementComponent::GetPredictionData_
 	}
 	return ClientPredictionData;
 }
+
+bool UBmCharacterMovementComponent::IsMovingOnGround() const
+{
+	return Super::IsMovingOnGround() || IsCustomMovementMode(BMove_Slide);
+}
+
+bool UBmCharacterMovementComponent::CanCrouchInCurrentState() const
+{
+	return Super::CanCrouchInCurrentState() && IsMovingOnGround();
+}
+
 void UBmCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
 {
 	Super::UpdateFromCompressedFlags(Flags);
-	bWantsToSprint = (Flags & FSavedMove_Character::FLAG_Custom_0) != 0;
+	bWantsToSprint = (Flags & FSavedMove_BattleMage::FLAG_Custom_0) != 0;
+	bWantsToSlide = (Flags & FSavedMove_BattleMage::FLAG_Custom_1) != 0;
 }
 
 void UBmCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation,
@@ -132,31 +166,15 @@ void UBmCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const 
 			MaxWalkSpeed = Walk_MaxWalkSpeed;
 		}
 	}
-	if(MovementMode == BMove_Slide)
+	if(bWantsToSlide)
 	{
-		if(bWantsToSlide)
-		{
-			
-		}
+		EnterSlide();
 	}
-	bPrev_WantsToCrouch = bWantsToCrouch;
-}
-
-void UBmCharacterMovementComponent::UpdateCharacterStateBeforeMovement(float DeltaSeconds)
-{
-	if(MovementMode == MOVE_Walking && !bWantsToCrouch && bPrev_WantsToCrouch)
-	{
-		FHitResult PotentialSlideSurface;
-		if(Velocity.SizeSquared() > pow(Slide_MinSpeed,2) && GetSlideSurface(PotentialSlideSurface))
-		{
-			EnterSlide();
-		}
-	}
-	if(IsCustomMovementMode(BMove_Slide) && !bWantsToCrouch)
+	else
 	{
 		ExitSlide();
 	}
-	Super::UpdateCharacterStateBeforeMovement(DeltaSeconds);
+	
 }
 
 void UBmCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations)
@@ -166,60 +184,94 @@ void UBmCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations
 	switch (CustomMovementMode)
 	{
 	case BMove_Slide:
-		PhysSlide(deltaTime,Iterations);
+		PhysSlide(deltaTime, Iterations);
 		break;
 	default:
-		UE_LOG(LogTemp,Error,TEXT("Invalid MovementMode"))
+		UE_LOG(LogTemp,Warning,TEXT("Invalid Mode"));
+	
 	}
 }
 
-bool UBmCharacterMovementComponent::IsMovingOnGround() const
+void UBmCharacterMovementComponent::UpdateCharacterStateBeforeMovement(float DeltaSeconds)
 {
-	return Super::IsMovingOnGround() || IsCustomMovementMode(BMove_Slide);
+	Super::UpdateCharacterStateBeforeMovement(DeltaSeconds);
+	/*Slide*/
+	bool bAuthProxy = CharacterOwner->HasAuthority() && !CharacterOwner->IsLocallyControlled();
+	if(bWantsToSlide && CanSlide())
+	{
+		if(!bAuthProxy || GetWorld()->GetTimeSeconds() - SlideStartTime > AuthSlideCooldownDuration)
+		{
+			PerformSlide();
+			bWantsToSlide = false;
+		}
+		else
+		{
+			UE_LOG(LogTemp,Warning,TEXT("Client Tried to cheat"))
+		}
+	}
 }
 
-bool UBmCharacterMovementComponent::CanCrouchInCurrentState() const
+void UBmCharacterMovementComponent::OnSlideCooldownFinished()
 {
-	return Super::CanCrouchInCurrentState() && IsMovingOnGround();
+	bWantsToSlide = true;
 }
 
 void UBmCharacterMovementComponent::EnterSlide()
 {
-	bWantsToCrouch = true;
+	bWantsToSlide = true;
 	Velocity += Velocity.GetSafeNormal2D() * Slide_EnterImpulse;
 	SetMovementMode(MOVE_Custom,BMove_Slide);
 }
-
 void UBmCharacterMovementComponent::ExitSlide()
 {
-	bWantsToCrouch = false;
-	
+	bWantsToSlide = false;
 	FQuat NewRotation = FRotationMatrix::MakeFromXZ(UpdatedComponent->GetForwardVector().GetSafeNormal2D(),FVector::UpVector).ToQuat();
 	FHitResult Hit;
 	SafeMoveUpdatedComponent(FVector::ZeroVector,NewRotation,true,Hit);
 	SetMovementMode(MOVE_Walking);
 }
 
-void UBmCharacterMovementComponent::PhysSlide(float DeltaTime, int32 It)
+bool UBmCharacterMovementComponent::CanSlide() const
 {
-	if(DeltaTime < MIN_TICK_TIME)
+	return IsWalking() && !IsCrouching();
+}
+
+void UBmCharacterMovementComponent::PerformSlide()
+{
+	SlideStartTime = GetWorld()->GetTimeSeconds();
+	FVector SlideDirection = (Acceleration.IsNearlyZero() ? UpdatedComponent->GetForwardVector() : Acceleration).GetSafeNormal2D();
+	Velocity = Slide_EnterImpulse * SlideDirection;
+
+	FQuat NewRotation = FRotationMatrix::MakeFromXZ(SlideDirection,FVector::UpVector).ToQuat();
+	FHitResult Hit;
+	SafeMoveUpdatedComponent(FVector::ZeroVector,NewRotation,false,Hit);
+	SetMovementMode(MOVE_Walking);
+	PlayerCharacter->PlayAnimMontage(PlayerCharacter->SlideMontage);
+	SlideStartDelegate.Broadcast();
+}
+
+void UBmCharacterMovementComponent::PhysSlide(float deltaTime, int32 Iterations)
+{
+	if (deltaTime < MIN_TICK_TIME)
 	{
-		return;
-	}
-	//RestorePreAdditiveRootMotionVelocity(); // use this if animation has root motion 
-	FHitResult SurfaceHit;
-	if(!GetSlideSurface(SurfaceHit) || Velocity.SizeSquared() < pow(Slide_MinSpeed , 2))
-	{
-		ExitSlide();
-		StartNewPhysics(DeltaTime,It);
 		return;
 	}
 
-	/*Surface Gravity*/
-	Velocity += Slide_GravityForce * FVector::DownVector * DeltaTime;
-	
-	/*Strafe*/
-	if(FMath::Abs(FVector::DotProduct(Acceleration.GetSafeNormal(),UpdatedComponent->GetRightVector())) > .5)
+	RestorePreAdditiveRootMotionVelocity();
+
+	FHitResult SurfaceHit;
+	if (!GetSlideSurface(SurfaceHit) || Velocity.SizeSquared() < pow(Slide_MinSpeed, 2))
+	{
+		ExitSlide();
+		StartNewPhysics(deltaTime, Iterations);
+		return;
+	}
+
+	// Surface Gravity
+	Velocity += Slide_GravityForce * FVector::DownVector * deltaTime;
+
+	// Strafe
+	if (FMath::Abs(FVector::DotProduct(Acceleration.GetSafeNormal(), UpdatedComponent->GetRightVector())) > .5)
 	{
 		Acceleration = Acceleration.ProjectOnTo(UpdatedComponent->GetRightVector());
 	}
@@ -228,51 +280,51 @@ void UBmCharacterMovementComponent::PhysSlide(float DeltaTime, int32 It)
 		Acceleration = FVector::ZeroVector;
 	}
 
-	/*Calculate Velocity*/
+	// Calc Velocity
 	if(!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
 	{
-		CalcVelocity(DeltaTime,Slide_Friction,true,GetMaxBrakingDeceleration());
+		CalcVelocity(deltaTime, Slide_Friction, true, GetMaxBrakingDeceleration());
 	}
-	ApplyRootMotionToVelocity(DeltaTime);
+	ApplyRootMotionToVelocity(deltaTime);
 
-	/*Perform Move*/
-	It++;
+	// Perform Move
+	Iterations++;
 	bJustTeleported = false;
 
 	FVector OldLocation = UpdatedComponent->GetComponentLocation();
 	FQuat OldRotation = UpdatedComponent->GetComponentRotation().Quaternion();
 	FHitResult Hit(1.f);
-	FVector Adjusted = Velocity * DeltaTime;
-	FVector VelPlanerDir = FVector::VectorPlaneProject(Velocity,SurfaceHit.Normal).GetSafeNormal();
-	FQuat NewRotation = FRotationMatrix::MakeFromXZ(VelPlanerDir,SurfaceHit.Normal).ToQuat();
-	SafeMoveUpdatedComponent(Adjusted,NewRotation,true,Hit);
+	FVector Adjusted = Velocity * deltaTime;
+	FVector VelPlaneDir = FVector::VectorPlaneProject(Velocity, SurfaceHit.Normal).GetSafeNormal();
+	FQuat NewRotation = FRotationMatrix::MakeFromXZ(VelPlaneDir, SurfaceHit.Normal).ToQuat();
+	SafeMoveUpdatedComponent(Adjusted, NewRotation, true, Hit);
 
-	if(Hit.Time < 1.f)
+	if (Hit.Time < 1.f)
 	{
-		HandleImpact(Hit,DeltaTime,Adjusted);
-		SlideAlongSurface(Adjusted,(1.f - Hit.Time),Hit.Normal,Hit,true);
+		HandleImpact(Hit, deltaTime, Adjusted);
+		SlideAlongSurface(Adjusted, (1.f - Hit.Time), Hit.Normal, Hit, true);
 	}
+
 	FHitResult NewSurfaceHit;
-	if(!GetSlideSurface(NewSurfaceHit) || Velocity.SizeSquared() < pow(Slide_MinSpeed , 2))
+	if (!GetSlideSurface(NewSurfaceHit) || Velocity.SizeSquared() < pow(Slide_MinSpeed, 2))
 	{
 		ExitSlide();
 	}
 
-	/*Update outgoing velocity*/
-	if(!bJustTeleported && !HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
+	// Update Outgoing Velocity & Acceleration
+	if( !bJustTeleported && !HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
 	{
-		Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / DeltaTime; // v = dx / dt
+		Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / deltaTime;
 	}
-	
 }
-
 bool UBmCharacterMovementComponent::GetSlideSurface(FHitResult& Hit) const
 {
 	FVector Start = UpdatedComponent->GetComponentLocation();
-	FVector End = (Start + CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f) * FVector::DownVector;
+	FVector End = Start + (CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f)* FVector::DownVector;
 	FName ProfileName = TEXT("BlockAll");
-	
 	return GetWorld()->LineTraceSingleByProfile(Hit,Start,End,ProfileName);
 }
+
+
 
 

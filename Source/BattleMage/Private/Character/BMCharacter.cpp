@@ -4,6 +4,7 @@
 #include "Character/BMCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Character/BMAnimInstance.h"
 #include "Character/BMCharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -47,6 +48,12 @@ void ABMCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	RotateInPlace(DeltaSeconds);
+}
+void ABMCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	SlideStartDelegate.Broadcast();
 }
 void ABMCharacter::RotateInPlace(float DeltaTime)
 {
@@ -124,8 +131,6 @@ void ABMCharacter::EquipButtonPressed()
 		}
 	}
 }
-
-
 AWeapon* ABMCharacter::GetEquippedWeapon()
 {
 	if(Combat == nullptr) return nullptr;
@@ -135,6 +140,24 @@ AWeapon* ABMCharacter::GetEquippedWeapon()
 bool ABMCharacter::IsWeaponEquipped()
 {
 	return (Combat && Combat->EquippedWeapon);
+}
+
+bool ABMCharacter::IsCrouching()
+{
+	if(GetBMCharacterComponent()->bWantsToCrouch)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool ABMCharacter::IsSliding()
+{
+	if(GetBMCharacterComponent()->IsSliding())
+	{
+		return true;
+	}
+	return false;
 }
 
 void ABMCharacter::ServerEquipButtonPressed_Implementation()
