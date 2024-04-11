@@ -4,8 +4,8 @@
 #include "Character/BMCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Character/BMAnimInstance.h"
 #include "Character/BMCharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -38,6 +38,7 @@ ABMCharacter::ABMCharacter(const FObjectInitializer& ObjectInitializer)
 	bUseControllerRotationYaw = false;
 
 	BMCharacterMovementComponent = Cast<UBmCharacterMovementComponent>(GetCharacterMovement());
+	BMCharacterMovementComponent->SetIsReplicated(true);
 	
 	Combat = CreateDefaultSubobject<UCombatComponent>("Combat");
 	Combat->SetIsReplicated(true);
@@ -55,6 +56,11 @@ void ABMCharacter::BeginPlay()
 	
 	SlideStartDelegate.Broadcast();
 }
+void ABMCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	InitAbilityActorInfo();
+}
 void ABMCharacter::RotateInPlace(float DeltaTime)
 {
 	if(Combat && Combat->EquippedWeapon)
@@ -71,8 +77,6 @@ void ABMCharacter::RotateInPlace(float DeltaTime)
 	}
 	AimOffset(DeltaTime);
 }
-
-
 void ABMCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -80,11 +84,6 @@ void ABMCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 }
 
-void ABMCharacter::PossessedBy(AController* NewController)
-{
-	Super::PossessedBy(NewController);
-	InitAbilityActorInfo();
-}
 void ABMCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
@@ -100,7 +99,18 @@ void ABMCharacter::PostInitializeComponents()
 	}
 	
 }
-
+/*Weapons*/
+void ABMCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
+{
+	if(OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickUpWidget(true);
+	}
+	if(LastWeapon)
+	{
+		LastWeapon->ShowPickUpWidget(false);
+	}
+}
 void ABMCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {
 	if(OverlappingWeapon)
@@ -136,30 +146,10 @@ AWeapon* ABMCharacter::GetEquippedWeapon()
 	if(Combat == nullptr) return nullptr;
 	return Combat->EquippedWeapon;
 }
-
 bool ABMCharacter::IsWeaponEquipped()
 {
 	return (Combat && Combat->EquippedWeapon);
 }
-
-bool ABMCharacter::IsCrouching()
-{
-	if(GetBMCharacterComponent()->bWantsToCrouch)
-	{
-		return true;
-	}
-	return false;
-}
-
-bool ABMCharacter::IsSliding()
-{
-	if(GetBMCharacterComponent()->IsSliding())
-	{
-		return true;
-	}
-	return false;
-}
-
 void ABMCharacter::ServerEquipButtonPressed_Implementation()
 {
 	if(Combat)
@@ -173,6 +163,35 @@ void ABMCharacter::ServerEquipButtonPressed_Implementation()
 			Combat->SwapWeapon();
 		}
 	}
+}
+/*End Weapons*/
+/*Character*/
+bool ABMCharacter::IsCrouching()
+{
+	if(GetBMCharacterComponent()->bWantsToCrouch)
+	{
+		return true;
+	}
+	return false;
+}
+bool ABMCharacter::IsSliding()
+{
+	if(GetBMCharacterComponent()->IsSliding())
+	{
+		return true;
+	}
+	return false;
+}
+void ABMCharacter::Jump()
+{
+	bPressedBattleMageJump = true;
+	bPressedJump = false;
+	Super::Jump();
+}
+void ABMCharacter::StopJumping()
+{
+	Super::StopJumping();
+	bPressedBattleMageJump = false;
 }
 void ABMCharacter::InitAbilityActorInfo()
 {
@@ -190,18 +209,6 @@ void ABMCharacter::InitAbilityActorInfo()
 		{
 			BattleMageHud->InitOverlay(BattleMagePlayerController,BattleMagePlayerState,AbilitySystemComponent,AttributeSet);
 		}
-	}
-}
-
-void ABMCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
-{
-	if(OverlappingWeapon)
-	{
-		OverlappingWeapon->ShowPickUpWidget(true);
-	}
-	if(LastWeapon)
-	{
-		LastWeapon->ShowPickUpWidget(false);
 	}
 }
 void ABMCharacter::AimOffset(float DeltaTime)
@@ -265,3 +272,4 @@ void ABMCharacter::TurnInPlace(float DeltaTime)
 		}
 	}
 }
+/*EndCharacter*/

@@ -8,6 +8,7 @@
 #include "BMGameplayTags.h"
 #include "Character/BMCharacter.h"
 #include "Character/BMCharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/Controller.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/Character.h"
@@ -43,32 +44,6 @@ void ABMPlayerController::BeginPlay()
 	
 }
 
-void ABMPlayerController::SetupInputComponent()
-{
-	Super::SetupInputComponent();
-
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-
-	EnhancedInputComponent->BindAction(
-		MoveAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Move);
-	EnhancedInputComponent->BindAction(
-		LookAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Look);
-	EnhancedInputComponent->BindAction(
-		JumpAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Jump);
-	EnhancedInputComponent->BindAction(
-		EquipAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Equip);
-	EnhancedInputComponent->BindAction(
-		ShiftPressed,ETriggerEvent::Started,this,&ABMPlayerController::StartSprint);
-	EnhancedInputComponent->BindAction(
-		ShiftPressed,ETriggerEvent::Completed,this,&ABMPlayerController::StopSprint);
-	EnhancedInputComponent->BindAction(
-		CrouchAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Crouch);
-	EnhancedInputComponent->BindAction(
-		SlideAction,ETriggerEvent::Started,this,&ABMPlayerController::Slide);
-	EnhancedInputComponent->BindAction(
-		SlideAction,ETriggerEvent::Completed,this,&ABMPlayerController::SlideReleased);
-}
-
 void ABMPlayerController::CursorTrace()
 {
 	if(GetASC() && GetASC()->HasMatchingGameplayTag(FBattleMageGameplayTags::Get().Player_Block_CursorTrace))
@@ -101,7 +76,31 @@ UBMAbilitySystemComponent* ABMPlayerController::GetASC()
 	}
 	return AuraAbilitySystemComponent;
 }
+void ABMPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
 
+	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+
+	EnhancedInputComponent->BindAction(
+		MoveAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Move);
+	EnhancedInputComponent->BindAction(
+		LookAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Look);
+	EnhancedInputComponent->BindAction(
+		JumpAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Jump);
+	EnhancedInputComponent->BindAction(
+		EquipAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Equip);
+	EnhancedInputComponent->BindAction(
+		ShiftPressed,ETriggerEvent::Started,this,&ABMPlayerController::StartSprint);
+	EnhancedInputComponent->BindAction(
+		ShiftPressed,ETriggerEvent::Completed,this,&ABMPlayerController::StopSprint);
+	EnhancedInputComponent->BindAction(
+		CrouchAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Crouch);
+	EnhancedInputComponent->BindAction(
+		SlideAction,ETriggerEvent::Started,this,&ABMPlayerController::Slide);
+	EnhancedInputComponent->BindAction(
+		SlideAction,ETriggerEvent::Completed,this,&ABMPlayerController::SlideReleased);
+}
 void ABMPlayerController::Move(const FInputActionValue& Value)
 {
 	APawn* ControlledPawn = GetPawn<APawn>();
@@ -145,7 +144,7 @@ void ABMPlayerController::Look(const FInputActionValue& Value)
 
 void ABMPlayerController::Jump(const FInputActionValue& Value)
 {
-	if(ACharacter* ControlledCharacter = GetPawn<ACharacter>())
+	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
 		ControlledCharacter->Jump();
 	}
@@ -179,7 +178,6 @@ void ABMPlayerController::Crouch(const FInputActionValue& Value)
 	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
 		ControlledCharacter->GetBMCharacterComponent()->CrouchPressed();
-		UE_LOG(LogTemp,Error,TEXT("Pressed Crouch"));
 	}
 }
 

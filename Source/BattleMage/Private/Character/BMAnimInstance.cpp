@@ -2,11 +2,9 @@
 
 
 #include "Character/BMAnimInstance.h"
-
 #include "Character/BMCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Player/BMPlayerController.h"
 
 void UBMAnimInstance::NativeInitializeAnimation()
 {

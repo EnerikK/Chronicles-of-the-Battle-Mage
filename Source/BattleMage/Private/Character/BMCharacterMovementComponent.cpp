@@ -5,11 +5,19 @@
 #include "Character/BMCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
+#include "Net/UnrealNetwork.h"
+#include "DrawDebugHelpers.h"
 
 
 UBmCharacterMovementComponent::UBmCharacterMovementComponent()
 {
 	NavAgentProps.bCanCrouch = true;
+}
+
+void UBmCharacterMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(UBmCharacterMovementComponent,Proxy_bSlideStart,COND_SkipOwner);
 }
 
 void UBmCharacterMovementComponent::SprintPressed()
@@ -45,6 +53,7 @@ void UBmCharacterMovementComponent::SlidePressed()
 void UBmCharacterMovementComponent::SlideReleased()
 {
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_SlideCooldown);
+	//bwantstoslide
 	bWantsToSlide = false;
 }
 
@@ -82,6 +91,9 @@ void UBmCharacterMovementComponent::FSavedMove_BattleMage::Clear()
 	
 	Saved_bWantsToSprint = 0;
 	Saved_bWantsToSlide = 0;
+	Saved_bPressedBattleMageJump = 0;
+	Saved_bHadAnimRootMotion = 0;
+	Saved_bTranstionFinished = 0;
 }
 
 uint8 UBmCharacterMovementComponent::FSavedMove_BattleMage::GetCompressedFlags() const
@@ -89,6 +101,7 @@ uint8 UBmCharacterMovementComponent::FSavedMove_BattleMage::GetCompressedFlags()
 	uint8 Result = Super::GetCompressedFlags();
 	if(Saved_bWantsToSprint)  Result |= FLAG_Custom_0;
 	if(Saved_bWantsToSlide) Result |= FLAG_Custom_1;
+	if(Saved_bPressedBattleMageJump) Result |= FLAG_Custom_2;
 	return  Result;
 
 }
@@ -101,6 +114,9 @@ void UBmCharacterMovementComponent::FSavedMove_BattleMage::SetMoveFor(ACharacter
 	const UBmCharacterMovementComponent* CharacterMovement = Cast<UBmCharacterMovementComponent>(C->GetCharacterMovement());
 	Saved_bWantsToSprint = CharacterMovement->bWantsToSprint;
 	Saved_bWantsToSlide = CharacterMovement->bWantsToSlide;
+	Saved_bPressedBattleMageJump = CharacterMovement->PlayerCharacter->bPressedBattleMageJump;
+	Saved_bHadAnimRootMotion = CharacterMovement->bHadAnimRootMotion;
+	Saved_bTranstionFinished = CharacterMovement->bTransitionFinished;
 }
 
 void UBmCharacterMovementComponent::FSavedMove_BattleMage::PrepMoveFor(ACharacter* C)
@@ -109,6 +125,9 @@ void UBmCharacterMovementComponent::FSavedMove_BattleMage::PrepMoveFor(ACharacte
 	UBmCharacterMovementComponent* CharacterMovement = Cast<UBmCharacterMovementComponent>(C->GetCharacterMovement());
 	CharacterMovement->bWantsToSprint = Saved_bWantsToSprint;
 	CharacterMovement->bWantsToSlide = Saved_bWantsToSlide;
+	CharacterMovement->PlayerCharacter->bPressedBattleMageJump = Saved_bPressedBattleMageJump;
+	CharacterMovement->bHadAnimRootMotion = Saved_bHadAnimRootMotion;
+	CharacterMovement->bTransitionFinished = Saved_bTranstionFinished;
 }
 
 UBmCharacterMovementComponent::FNetworkPredictionData_Client_BattleMage::FNetworkPredictionData_Client_BattleMage(
@@ -147,6 +166,7 @@ void UBmCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
 {
 	Super::UpdateFromCompressedFlags(Flags);
 	bWantsToSprint = (Flags & FSavedMove_BattleMage::FLAG_Custom_0) != 0;
+	//bwants to slide
 	bWantsToSlide = (Flags & FSavedMove_BattleMage::FLAG_Custom_1) != 0;
 }
 
@@ -166,36 +186,19 @@ void UBmCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const 
 			MaxWalkSpeed = Walk_MaxWalkSpeed;
 		}
 	}
-	if(bWantsToSlide)
-	{
-		EnterSlide();
-	}
-	else
-	{
-		ExitSlide();
-	}
 	
 }
 
 void UBmCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations)
 {
 	Super::PhysCustom(deltaTime, Iterations);
-
-	switch (CustomMovementMode)
-	{
-	case BMove_Slide:
-		PhysSlide(deltaTime, Iterations);
-		break;
-	default:
-		UE_LOG(LogTemp,Warning,TEXT("Invalid Mode"));
-	
-	}
 }
 
 void UBmCharacterMovementComponent::UpdateCharacterStateBeforeMovement(float DeltaSeconds)
 {
 	Super::UpdateCharacterStateBeforeMovement(DeltaSeconds);
 	/*Slide*/
+	
 	bool bAuthProxy = CharacterOwner->HasAuthority() && !CharacterOwner->IsLocallyControlled();
 	if(bWantsToSlide && CanSlide())
 	{
@@ -203,34 +206,45 @@ void UBmCharacterMovementComponent::UpdateCharacterStateBeforeMovement(float Del
 		{
 			PerformSlide();
 			bWantsToSlide = false;
+			Proxy_bSlideStart = !Proxy_bSlideStart;
 		}
 		else
 		{
 			UE_LOG(LogTemp,Warning,TEXT("Client Tried to cheat"))
 		}
 	}
+	/*try Mantle*/
+	if(PlayerCharacter->bPressedBattleMageJump)
+	{
+		if(TryMantle())
+		{
+			PlayerCharacter->StopJumping();
+		}
+		else
+		{
+			PlayerCharacter->bPressedBattleMageJump = false;
+			CharacterOwner->bPressedJump = true;
+			CharacterOwner->CheckJumpInput(DeltaSeconds);
+		}
+	}
 }
 
+void UBmCharacterMovementComponent::UpdateCharacterStateAfterMovement(float DeltaSeconds)
+{
+	Super::UpdateCharacterStateAfterMovement(DeltaSeconds);
+	
+}
+
+void UBmCharacterMovementComponent::OnRep_SlideStart()
+{
+	PlayerCharacter->PlayAnimMontage(PlayerCharacter->GetSlideMontage());
+	SlideStartDelegate.Broadcast();
+}
 void UBmCharacterMovementComponent::OnSlideCooldownFinished()
 {
 	bWantsToSlide = true;
-}
 
-void UBmCharacterMovementComponent::EnterSlide()
-{
-	bWantsToSlide = true;
-	Velocity += Velocity.GetSafeNormal2D() * Slide_EnterImpulse;
-	SetMovementMode(MOVE_Custom,BMove_Slide);
 }
-void UBmCharacterMovementComponent::ExitSlide()
-{
-	bWantsToSlide = false;
-	FQuat NewRotation = FRotationMatrix::MakeFromXZ(UpdatedComponent->GetForwardVector().GetSafeNormal2D(),FVector::UpVector).ToQuat();
-	FHitResult Hit;
-	SafeMoveUpdatedComponent(FVector::ZeroVector,NewRotation,true,Hit);
-	SetMovementMode(MOVE_Walking);
-}
-
 bool UBmCharacterMovementComponent::CanSlide() const
 {
 	return IsWalking() && !IsCrouching();
@@ -246,85 +260,42 @@ void UBmCharacterMovementComponent::PerformSlide()
 	FHitResult Hit;
 	SafeMoveUpdatedComponent(FVector::ZeroVector,NewRotation,false,Hit);
 	SetMovementMode(MOVE_Walking);
-	PlayerCharacter->PlayAnimMontage(PlayerCharacter->SlideMontage);
+	PlayerCharacter->PlayAnimMontage(PlayerCharacter->GetSlideMontage());
 	SlideStartDelegate.Broadcast();
 }
-
-void UBmCharacterMovementComponent::PhysSlide(float deltaTime, int32 Iterations)
+/*Mantle*/
+void UBmCharacterMovementComponent::OnRep_ShortMantle()
 {
-	if (deltaTime < MIN_TICK_TIME)
-	{
-		return;
-	}
-
-	RestorePreAdditiveRootMotionVelocity();
-
-	FHitResult SurfaceHit;
-	if (!GetSlideSurface(SurfaceHit) || Velocity.SizeSquared() < pow(Slide_MinSpeed, 2))
-	{
-		ExitSlide();
-		StartNewPhysics(deltaTime, Iterations);
-		return;
-	}
-
-	// Surface Gravity
-	Velocity += Slide_GravityForce * FVector::DownVector * deltaTime;
-
-	// Strafe
-	if (FMath::Abs(FVector::DotProduct(Acceleration.GetSafeNormal(), UpdatedComponent->GetRightVector())) > .5)
-	{
-		Acceleration = Acceleration.ProjectOnTo(UpdatedComponent->GetRightVector());
-	}
-	else
-	{
-		Acceleration = FVector::ZeroVector;
-	}
-
-	// Calc Velocity
-	if(!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
-	{
-		CalcVelocity(deltaTime, Slide_Friction, true, GetMaxBrakingDeceleration());
-	}
-	ApplyRootMotionToVelocity(deltaTime);
-
-	// Perform Move
-	Iterations++;
-	bJustTeleported = false;
-
-	FVector OldLocation = UpdatedComponent->GetComponentLocation();
-	FQuat OldRotation = UpdatedComponent->GetComponentRotation().Quaternion();
-	FHitResult Hit(1.f);
-	FVector Adjusted = Velocity * deltaTime;
-	FVector VelPlaneDir = FVector::VectorPlaneProject(Velocity, SurfaceHit.Normal).GetSafeNormal();
-	FQuat NewRotation = FRotationMatrix::MakeFromXZ(VelPlaneDir, SurfaceHit.Normal).ToQuat();
-	SafeMoveUpdatedComponent(Adjusted, NewRotation, true, Hit);
-
-	if (Hit.Time < 1.f)
-	{
-		HandleImpact(Hit, deltaTime, Adjusted);
-		SlideAlongSurface(Adjusted, (1.f - Hit.Time), Hit.Normal, Hit, true);
-	}
-
-	FHitResult NewSurfaceHit;
-	if (!GetSlideSurface(NewSurfaceHit) || Velocity.SizeSquared() < pow(Slide_MinSpeed, 2))
-	{
-		ExitSlide();
-	}
-
-	// Update Outgoing Velocity & Acceleration
-	if( !bJustTeleported && !HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
-	{
-		Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / deltaTime;
-	}
+	
 }
-bool UBmCharacterMovementComponent::GetSlideSurface(FHitResult& Hit) const
+void UBmCharacterMovementComponent::OnRep_TallMantle()
 {
-	FVector Start = UpdatedComponent->GetComponentLocation();
-	FVector End = Start + (CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f)* FVector::DownVector;
-	FName ProfileName = TEXT("BlockAll");
-	return GetWorld()->LineTraceSingleByProfile(Hit,Start,End,ProfileName);
+	
+}
+bool UBmCharacterMovementComponent::TryMantle() const
+{
+	return false;
+}
+FVector UBmCharacterMovementComponent::GetMantleStartLocation(FHitResult FrontHit, FHitResult SurfaceHit,
+	bool bTallMantle)
+{
+	return FVector::ZeroVector;
 }
 
+#pragma region Helpers
+bool UBmCharacterMovementComponent::IsServer() const
+{
+	return CharacterOwner->HasAuthority();
+}
 
+float UBmCharacterMovementComponent::CapR() const
+{
+	return CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleRadius();
+}
 
+float UBmCharacterMovementComponent::CapHH() const
+{
+	return CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+}
+#pragma endregion 
 

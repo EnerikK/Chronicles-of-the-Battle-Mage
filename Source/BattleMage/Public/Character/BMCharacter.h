@@ -28,36 +28,44 @@ class BATTLEMAGE_API ABMCharacter : public ABMCharacterBase
 public:
 
 	ABMCharacter(const FObjectInitializer& ObjectInitializer);
-	
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 	virtual void PostInitializeComponents() override;
-	
+
+	/*Weapons*/
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	void EquipButtonPressed();
-	
-	void RotateInPlace(float DeltaTime);
-	
 	AWeapon* GetEquippedWeapon();
 	bool IsWeaponEquipped();
 
+	/*Character*/
+	void RotateInPlace(float DeltaTime);
 	bool IsCrouching();
 	bool IsSliding();
+	bool bPressedBattleMageJump;
+	
+	virtual void Jump() override;
+	virtual void StopJumping() override;
 
+	/*Delegates*/
 	UPROPERTY()
 	FSlideStartDelegate SlideStartDelegate;
 	
-	UPROPERTY(EditAnywhere , Category= "Combat")
-	UAnimMontage* SlideMontage;
-
+	/*Getters*/
 	FORCEINLINE float GetAO_Yaw() const {return AO_Yaw;}
 	FORCEINLINE float GetAO_Pitch() const {return  AO_Pitch;}
 	FORCEINLINE ETurnInPlace GetTurningInPlace() const {return TurningInPlace;}
 	FORCEINLINE UBmCharacterMovementComponent* GetBMCharacterComponent() const {return BMCharacterMovementComponent;}
+	FORCEINLINE UAnimMontage* GetSlideMontage() const {return SlideMontage;}
+	FORCEINLINE UAnimMontage* GetSwordPickUpMontage() const {return SwordPickUpMontage;}
+
 
 protected:
+
+	virtual void BeginPlay() override;
+	void AimOffset(float DeltaTime);
 	
 	UPROPERTY()
 	ABMPlayerController* PlayerController;
@@ -68,28 +76,32 @@ protected:
 	UPROPERTY()
 	ABMHud* Hud;
 
-	UPROPERTY(BlueprintReadOnly,EditDefaultsOnly,Category=Movement,meta=(AllowPrivateAccess = true))
-	UBmCharacterMovementComponent* BMCharacterMovementComponent;
-
-	virtual void BeginPlay() override;
-
-	void AimOffset(float DeltaTime);
-
 private:
+
+	virtual void InitAbilityActorInfo() override;
 	
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,meta = (AllowPrivateAccess = true))
 	UCombatComponent* Combat;
 
+	UPROPERTY(BlueprintReadOnly,EditDefaultsOnly,Category=Movement,meta=(AllowPrivateAccess = true))
+	UBmCharacterMovementComponent* BMCharacterMovementComponent;
+	
 	UFUNCTION(Server,Reliable)
 	void ServerEquipButtonPressed();
 	
-	virtual void InitAbilityActorInfo() override;
-
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	AWeapon* OverlappingWeapon;
 	
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
+
+	/*Turn In place*/
+	ETurnInPlace TurningInPlace;
+	void TurnInPlace(float DeltaTime);
+	float AO_Yaw;
+	float InterpAO_Yaw;
+	float AO_Pitch;
+	FRotator StartingAimRotation;
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> CameraComponent;
@@ -97,12 +109,10 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> CameraBoom;
 
-	ETurnInPlace TurningInPlace;
-	void TurnInPlace(float DeltaTime);
+	UPROPERTY(EditAnywhere , Category= "Combat")
+	UAnimMontage* SlideMontage;
 
-	float AO_Yaw;
-	float InterpAO_Yaw;
-	float AO_Pitch;
-	FRotator StartingAimRotation;
+	UPROPERTY(EditAnywhere , Category= "Combat")
+	UAnimMontage* SwordPickUpMontage;
 	
 };

@@ -33,8 +33,7 @@ protected:
 	virtual void SetupInputComponent() override;
 
 private:
-
-
+	
 	UBMAbilitySystemComponent* GetASC();
 
 	UPROPERTY()
