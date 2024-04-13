@@ -9,6 +9,7 @@
 #include "Types/TurnInPlace.h"
 #include "BMCharacter.generated.h"
 
+class ABMPlayerState;
 class UBmCharacterMovementComponent;
 class AWeapon;
 class ABMPlayerController;
@@ -75,6 +76,9 @@ protected:
 	
 	UPROPERTY()
 	ABMHud* Hud;
+
+	UPROPERTY()
+	ABMPlayerState* BMPlayerState;
 
 private:
 

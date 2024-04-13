@@ -20,6 +20,13 @@ ABMEnemy::ABMEnemy(const FObjectInitializer& ObjectInitializer)
 	AttributeSet = CreateDefaultSubobject<UBMAttributeSet>("Attribute");
 }
 
+void ABMEnemy::InitAbilityActorInfo()
+{
+	AbilitySystemComponent->InitAbilityActorInfo(this,this);
+	Cast<UBMAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
+
+}
+
 void ABMEnemy::Highlight()
 {
 	GetMesh()->SetRenderCustomDepth(true);
@@ -34,5 +41,4 @@ void ABMEnemy::UnHighlight()
 void ABMEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	AbilitySystemComponent->InitAbilityActorInfo(this,this);
 }

@@ -3,6 +3,7 @@
 
 #include "Character/BMCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Character/BMCharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -199,6 +200,7 @@ void ABMCharacter::InitAbilityActorInfo()
 	check(BattleMagePlayerState)
 
 	BattleMagePlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(BattleMagePlayerState,this);
+	Cast<UBMAbilitySystemComponent>(BattleMagePlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 	AbilitySystemComponent = BattleMagePlayerState->GetAbilitySystemComponent();AttributeSet = BattleMagePlayerState->GetAttributeSet();
 	AttributeSet = BattleMagePlayerState->GetAttributeSet();
 

@@ -67,6 +67,23 @@ void ABMPlayerController::CursorTrace()
 	}
 }
 
+void ABMPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
+{
+	/*Gengine.addonscreendebugmessage(1,3.f,fcolor::Red,Inputtag.tostring();*/
+}
+
+void ABMPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
+{
+	if(GetASC() == nullptr) return;
+	GetASC()->AbilityInputTagReleased(InputTag);
+}
+
+void ABMPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
+{
+	if(GetASC() == nullptr) return;
+	GetASC()->AbilityInputTagHeld(InputTag);
+}
+
 UBMAbilitySystemComponent* ABMPlayerController::GetASC()
 {
 	if(AuraAbilitySystemComponent == nullptr)

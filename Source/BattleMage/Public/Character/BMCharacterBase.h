@@ -35,6 +35,8 @@ public:
 protected:
 	
 	virtual void BeginPlay() override;
+	virtual void InitAbilityActorInfo();
+	void AddCharacterAbilities();
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
@@ -53,13 +55,16 @@ protected:
 
 	UPROPERTY(EditAnywhere,Category="Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
-
-	virtual void InitAbilityActorInfo();
-
+	
 	UPROPERTY(EditDefaultsOnly)
 	FName RightHandSocket;
 
 	bool bIsDead = false;
+
+private:
+
+	UPROPERTY(EditAnywhere,Category="Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartUpAbilities;
 	
 	
 

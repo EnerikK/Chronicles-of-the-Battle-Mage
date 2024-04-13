@@ -7,6 +7,8 @@
 #include "GameFramework/PlayerController.h"
 #include "BMPlayerController.generated.h"
 
+class UBMInputConfig;
+struct FGameplayTag;
 class UBMAbilitySystemComponent;
 class IEnemyInterface;
 class UInputAction;
@@ -36,6 +38,9 @@ private:
 	
 	UBMAbilitySystemComponent* GetASC();
 
+	UPROPERTY(EditDefaultsOnly,Category="Input")
+	TObjectPtr<UBMInputConfig> InputConfig;
+	
 	UPROPERTY()
 	TObjectPtr<UBMAbilitySystemComponent> AuraAbilitySystemComponent;
 
@@ -43,6 +48,11 @@ private:
 	IEnemyInterface* LastActor;
 	IEnemyInterface* ThisActor;
 	FHitResult CursorHit;
+
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
+	
 
 	UPROPERTY(EditAnywhere,Category="Input")
 	TObjectPtr<UInputMappingContext> BMContest;

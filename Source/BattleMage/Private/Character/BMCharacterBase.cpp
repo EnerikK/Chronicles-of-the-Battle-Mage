@@ -60,13 +60,13 @@ void ABMCharacterBase::BeginPlay()
 
 void ABMCharacterBase::InitAbilityActorInfo()
 {
-	ABMPlayerState* BattleMagePlayerState = GetPlayerState<ABMPlayerState>();
-	check(BattleMagePlayerState)
-	
-	BattleMagePlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(BattleMagePlayerState,this);
-	Cast<UBMAbilitySystemComponent>(BattleMagePlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
-	AbilitySystemComponent = BattleMagePlayerState->GetAbilitySystemComponent();
-	AttributeSet = BattleMagePlayerState->GetAttributeSet();
+}
+
+void ABMCharacterBase::AddCharacterAbilities()
+{
+	UBMAbilitySystemComponent* BMASC = CastChecked<UBMAbilitySystemComponent>(AbilitySystemComponent);
+	if(!HasAuthority()) return;
+	BMASC->AddCharacterAbilities(StartUpAbilities);
 }
 
 
