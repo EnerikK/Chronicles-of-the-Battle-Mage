@@ -11,11 +11,8 @@
 UBMAttributeSet::UBMAttributeSet()
 {
 	InitHealth(150.f);
-	InitMaxHealth(200.f);
 	InitMana(80.f);
-	InitMaxMana(200.f);
 	InitStamina(100.f);
-	InitMaxStamina(200.f);
 }
 
 void UBMAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -116,4 +113,81 @@ void UBMAttributeSet::OnRep_MaxStamina(const FGameplayAttributeData& oldMaxStami
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,MaxStamina,oldMaxStamina);
 }
 
+void UBMAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldStrength) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,Strength,OldStrength);
+
+}
+
+void UBMAttributeSet::OnRep_Intelligence(const FGameplayAttributeData& OldIntelligence) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,Intelligence,OldIntelligence);
+
+}
+
+void UBMAttributeSet::OnRep_Resilience(const FGameplayAttributeData& OldResilience) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,Resilience,OldResilience);
+
+}
+
+void UBMAttributeSet::OnRep_Vigor(const FGameplayAttributeData& OldVigor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,Vigor,OldVigor);
+
+}
+
+void UBMAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,Armor,OldArmor);
+
+}
+
+void UBMAttributeSet::OnRep_ArmorPenetration(const FGameplayAttributeData& OldArmorPenetration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,ArmorPenetration,OldArmorPenetration);
+
+}
+
+void UBMAttributeSet::OnRep_BlockChance(const FGameplayAttributeData& OldBlockChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,BlockChance,OldBlockChance);
+
+}
+
+void UBMAttributeSet::OnRep_CriticalHitChance(const FGameplayAttributeData& OldCriticalHitChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,CriticalHitChance,OldCriticalHitChance);
+
+}
+
+void UBMAttributeSet::OnRep_CriticalHitDamage(const FGameplayAttributeData& OldCriticalHitDamage) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,CriticalHitDamage,OldCriticalHitDamage);
+
+}
+
+void UBMAttributeSet::OnRep_CriticalHitResistance(const FGameplayAttributeData& OldCriticalHitResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,CriticalHitResistance,OldCriticalHitResistance);
+
+}
+
+void UBMAttributeSet::OnRep_HealthRegeneration(const FGameplayAttributeData& OldHealthRegeneration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,HealthRegeneration,OldHealthRegeneration);
+
+}
+
+void UBMAttributeSet::OnRep_ManaRegeneration(const FGameplayAttributeData& OldManaRegeneration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,ManaRegeneration,OldManaRegeneration);
+
+}
+
+void UBMAttributeSet::OnRep_StaminaRegeneration(const FGameplayAttributeData& OldStaminaRegeneration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,StaminaRegeneration,OldStaminaRegeneration);
+
+}
 

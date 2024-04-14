@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BMAnimInstance.h"
+#include "BMCharacterMovementComponent.h"
 #include "Character/BMCharacterBase.h"
 #include "HUD/BMHud.h"
 #include "Types/TurnInPlace.h"
@@ -38,8 +39,10 @@ public:
 	/*Weapons*/
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	void EquipButtonPressed();
+	void AttackButtonPressed(int32 IncrementAttack);
 	AWeapon* GetEquippedWeapon();
 	bool IsWeaponEquipped();
+	bool CanAttack();
 
 	/*Character*/
 	void RotateInPlace(float DeltaTime);

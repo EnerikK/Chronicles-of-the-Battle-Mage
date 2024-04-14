@@ -17,8 +17,8 @@ UCombatComponent::UCombatComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 	
 	BaseWalkSpeed = 600.f;
-	
 }
+
 void UCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -49,7 +49,6 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent,SecondaryWeapon);
 
 }
-
 void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 {
 	if(Character == nullptr || WeaponToEquip == nullptr) return;

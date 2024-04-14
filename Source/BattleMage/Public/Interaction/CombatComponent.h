@@ -57,7 +57,6 @@ protected:
 	void EquipPrimaryWeapon(AWeapon* WeaponToEquip);
 	void EquipSecondaryWeapon(AWeapon* WeaponToEquip);
 
-
 private: 
 
 	UPROPERTY()

@@ -50,6 +50,10 @@ public:
 
 	FORCEINLINE USphereComponent* GetPickUpSphere() const {return PickUpSphere;}
 	FORCEINLINE EWeaponType GetWeaponType() const {return WeaponType;}
+	FORCEINLINE UAnimMontage* GetAttackMontage() const  {return AttackMontage;}
+
+
+
 	
 	/*
 	* Texture for the cross-hairs
@@ -112,4 +116,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	EWeaponType WeaponType;
+
+	UPROPERTY(EditDefaultsOnly,Category="Combat")
+	UAnimMontage* AttackMontage;
+
+
 };

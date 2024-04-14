@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
-#include "BMCharacterMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
 #include "BMCharacterBase.generated.h"
 
 class UAbilitySystemComponent;
 class UAttributeSet;
+class UGameplayEffect;
 
 UCLASS()
 class BATTLEMAGE_API ABMCharacterBase : public ACharacter , public IAbilitySystemInterface , public ICombatInterface
@@ -37,6 +37,14 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo();
 	void AddCharacterAbilities();
+	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass,float Level)const;
+	void InitializeDefaultAttributes()const;
+
+	UPROPERTY(BlueprintReadOnly,EditAnywhere,Category="Attributes")
+	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
+
+	UPROPERTY(BlueprintReadOnly,EditAnywhere,Category="Attributes")
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;

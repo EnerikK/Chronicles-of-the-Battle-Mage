@@ -142,6 +142,11 @@ void ABMCharacter::EquipButtonPressed()
 		}
 	}
 }
+
+void ABMCharacter::AttackButtonPressed(int32 IncrementAttack)
+{
+}
+
 AWeapon* ABMCharacter::GetEquippedWeapon()
 {
 	if(Combat == nullptr) return nullptr;
@@ -151,6 +156,12 @@ bool ABMCharacter::IsWeaponEquipped()
 {
 	return (Combat && Combat->EquippedWeapon);
 }
+
+bool ABMCharacter::CanAttack()
+{
+	return (Combat && Combat->EquippedWeapon);
+}
+
 void ABMCharacter::ServerEquipButtonPressed_Implementation()
 {
 	if(Combat)
@@ -212,6 +223,7 @@ void ABMCharacter::InitAbilityActorInfo()
 			BattleMageHud->InitOverlay(BattleMagePlayerController,BattleMagePlayerState,AbilitySystemComponent,AttributeSet);
 		}
 	}
+	InitializeDefaultAttributes();
 }
 void ABMCharacter::AimOffset(float DeltaTime)
 {

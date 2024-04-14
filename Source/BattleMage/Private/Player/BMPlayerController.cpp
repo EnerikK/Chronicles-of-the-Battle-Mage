@@ -12,6 +12,7 @@
 #include "GameFramework/Controller.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/Character.h"
+#include "Interaction/CombatComponent.h"
 #include "Interaction/EnemyInterface.h"
 
 
@@ -117,6 +118,8 @@ void ABMPlayerController::SetupInputComponent()
 		SlideAction,ETriggerEvent::Started,this,&ABMPlayerController::Slide);
 	EnhancedInputComponent->BindAction(
 		SlideAction,ETriggerEvent::Completed,this,&ABMPlayerController::SlideReleased);
+	EnhancedInputComponent->BindAction(
+		AttackAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Attack);
 }
 void ABMPlayerController::Move(const FInputActionValue& Value)
 {
@@ -211,6 +214,13 @@ void ABMPlayerController::SlideReleased(const FInputActionValue& Value)
 	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
 		ControlledCharacter->GetBMCharacterComponent()->SlideReleased();
+	}
+}
+
+void ABMPlayerController::Attack(const FInputActionValue& Value)
+{
+	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
+	{
 	}
 }
 

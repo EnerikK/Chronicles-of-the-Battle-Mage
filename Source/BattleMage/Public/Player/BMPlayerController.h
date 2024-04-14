@@ -77,6 +77,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> SlideAction;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> AttackAction;
 	
 	
 	void Move(const FInputActionValue& Value);
@@ -88,5 +91,7 @@ private:
 	void Crouch(const FInputActionValue& Value);
 	void Slide(const FInputActionValue& Value);
 	void SlideReleased(const FInputActionValue& Value);
+	void Attack(const FInputActionValue& Value);
+
 	
 };
