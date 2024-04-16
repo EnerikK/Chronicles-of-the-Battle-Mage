@@ -8,11 +8,9 @@
 #include "BMGameplayTags.h"
 #include "Character/BMCharacter.h"
 #include "Character/BMCharacterMovementComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "GameFramework/Controller.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/Character.h"
-#include "Interaction/CombatComponent.h"
 #include "Interaction/EnemyInterface.h"
 
 

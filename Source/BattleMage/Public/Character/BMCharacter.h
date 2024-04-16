@@ -23,7 +23,7 @@ class UTexture2D;
  * 
  */
 UCLASS()
-class BATTLEMAGE_API ABMCharacter : public ABMCharacterBase 
+class BATTLEMAGE_API ABMCharacter : public ABMCharacterBase
 {
 	GENERATED_BODY()
 
@@ -49,6 +49,7 @@ public:
 	bool IsCrouching();
 	bool IsSliding();
 	bool bPressedBattleMageJump;
+
 	
 	virtual void Jump() override;
 	virtual void StopJumping() override;

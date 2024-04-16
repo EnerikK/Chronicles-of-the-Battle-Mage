@@ -1,21 +1,35 @@
-// Hello
+// Hello :)
 
 #pragma once
-
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 
 /*BattleMage GameplayTags
-Singleton containing native tags
+ *Singleton containing native tags
 */
 
 struct FBattleMageGameplayTags
 {
-public:
+	
 	static const FBattleMageGameplayTags& Get(){return GameplayTags;}
 	static void InitializeNativeGameplayTags();
-
+	
+	FGameplayTag Attributes_Primary_Strength;
+	FGameplayTag Attributes_Primary_Intelligence;
+	FGameplayTag Attributes_Primary_Resilience;
+	FGameplayTag Attributes_Primary_Vigor;
+	FGameplayTag Attributes_Secondary_Armor;
+	FGameplayTag Attributes_Secondary_ArmorPenetration;
+	FGameplayTag Attributes_Secondary_BlockChance;
+	FGameplayTag Attributes_Secondary_CriticalHitChance;
+	FGameplayTag Attributes_Secondary_CriticalHitDamage;
+	FGameplayTag Attributes_Secondary_CriticalHitResistance;
+	FGameplayTag Attributes_Secondary_HealthRegeneration;
+	FGameplayTag Attributes_Secondary_ManaRegeneration;
+	FGameplayTag Attributes_Secondary_MaxHealth;
+	FGameplayTag Attributes_Secondary_MaxMana;
+	
 	FGameplayTag InputTag_LMB;
 	FGameplayTag InputTag_RMB;
 	FGameplayTag InputTag_1;

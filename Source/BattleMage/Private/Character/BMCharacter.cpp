@@ -61,6 +61,7 @@ void ABMCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	InitAbilityActorInfo();
+	AddCharacterAbilities();
 }
 void ABMCharacter::RotateInPlace(float DeltaTime)
 {

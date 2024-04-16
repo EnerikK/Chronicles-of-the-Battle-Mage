@@ -7,7 +7,6 @@
 #include "BMGameplayTags.h"
 #include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "Character/BMCharacterMovementComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "Player/BMPlayerState.h"
 
 class UBmCharacterMovementComponent;
@@ -16,8 +15,8 @@ ABMCharacterBase::ABMCharacterBase(const FObjectInitializer& ObjectInitializer)
 :Super(ObjectInitializer.SetDefaultSubobjectClass<UBmCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
 	const FBattleMageGameplayTags& GameplayTags = FBattleMageGameplayTags::Get();
+	
 	
 }
 void ABMCharacterBase::Tick(float DeltaTime)
@@ -53,6 +52,13 @@ FVector ABMCharacterBase::GetCombatSocketLocation_Implementation(const FGameplay
 	return FVector();
 }
 
+int32 ABMCharacterBase::GetPlayerLevel_Implementation()
+{
+	const ABMPlayerState* BattleMagePlayerState = GetPlayerState<ABMPlayerState>();
+	check(BattleMagePlayerState);
+	return BattleMagePlayerState->GetPlayerLevel();
+}
+
 void ABMCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -83,6 +89,7 @@ void ABMCharacterBase::InitializeDefaultAttributes() const
 {
 	ApplyEffectToSelf(DefaultPrimaryAttributes,1.f);
 	ApplyEffectToSelf(DefaultSecondaryAttributes,1.f);
+	ApplyEffectToSelf(DefaultVitalAttributes,1.f);
 }
 
 

@@ -47,6 +47,9 @@ class BATTLEMAGE_API ICombatInterface
 
 public:
 
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetPlayerLevel();
+
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
 	FVector GetCombatSocketLocation(const FGameplayTag& MontageTag);
 

@@ -19,12 +19,13 @@ class BATTLEMAGE_API UBMAbilitySystemComponent : public UAbilitySystemComponent
 public:
 
 	void AbilityActorInfoSet();
-
-	FEffectAssetTags EffectAssetTags;
-
+	
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartUpAbilities);
 	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
+
+	FEffectAssetTags EffectAssetTags;
+
 
 protected:
 

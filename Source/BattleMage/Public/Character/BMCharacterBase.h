@@ -31,6 +31,8 @@ public:
 
 	FOnASCRegistered OnAscRegistered;
 
+	virtual int32 GetPlayerLevel_Implementation() override;
+
 	
 protected:
 	
@@ -45,6 +47,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly,EditAnywhere,Category="Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
+
+	UPROPERTY(BlueprintReadOnly,EditAnywhere,Category="Attributes")
+	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;

@@ -4,6 +4,7 @@
 #include "Player/BMPlayerState.h"
 #include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "AbilitySystem/BMAttributeSet.h"
+#include "Net/UnrealNetwork.h"
 #include "Player/BMPlayerController.h"
 
 
@@ -20,7 +21,18 @@ ABMPlayerState::ABMPlayerState()
 	NetUpdateFrequency = 100.f;
 }
 
+void ABMPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ABMPlayerState,Level);
+}
+
 UAbilitySystemComponent* ABMPlayerState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void ABMPlayerState::OnRep_Level(int32 OldLevel)
+{
+	OnLevelChangedDelegate.Broadcast(Level);
 }

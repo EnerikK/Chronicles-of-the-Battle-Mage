@@ -19,16 +19,11 @@ void UBMAbilitySystemComponent::EffectApplied(UAbilitySystemComponent* AbilitySy
 
 void UBMAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartUpAbilities)
 {
-	for(const TSubclassOf<UGameplayAbility> AbilityClass : StartUpAbilities)
+	for (TSubclassOf<UGameplayAbility> AbilityClass : StartUpAbilities)
 	{
-		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass,1);
-
-		if(const UBMGameplayAbility* AuraAbility = Cast<UBMGameplayAbility>(AbilitySpec.Ability))
-		{
-			AbilitySpec.DynamicAbilityTags.AddTag(AuraAbility->StartupInputTag);
-			GiveAbility(AbilitySpec);
-
-		}
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		//GiveAbility(AbilitySpec);
+		GiveAbilityAndActivateOnce(AbilitySpec);
 	}
 }
 
