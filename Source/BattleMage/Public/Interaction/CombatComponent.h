@@ -31,6 +31,8 @@ public:
 	void EquipWeapon(AWeapon* WeaponToEquip);
 	bool bShouldSwapWeapon();
 	void SwapWeapon();
+
+
 	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;

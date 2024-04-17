@@ -8,9 +8,12 @@
 #include "BMGameplayTags.h"
 #include "Character/BMCharacter.h"
 #include "Character/BMCharacterMovementComponent.h"
+#include "AbilitySystem/Abilities/BMGameplayAbility.h"
 #include "GameFramework/Controller.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/Character.h"
+#include "Input/BMInputComponent.h"
+#include "Interaction/CombatComponent.h"
 #include "Interaction/EnemyInterface.h"
 
 
@@ -68,19 +71,41 @@ void ABMPlayerController::CursorTrace()
 
 void ABMPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	/*Gengine.addonscreendebugmessage(1,3.f,fcolor::Red,Inputtag.tostring();*/
-}
+	if(GetASC() && GetASC()->HasMatchingGameplayTag(FBattleMageGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
 
+	
+	if(GetASC()) GetASC()->AbilityInputTagPressed(InputTag);
+}
 void ABMPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	if(GetASC() == nullptr) return;
-	GetASC()->AbilityInputTagReleased(InputTag);
+	if(GetASC() && GetASC()->HasMatchingGameplayTag(FBattleMageGameplayTags::Get().Player_Block_InputReleased))
+	{
+		return;
+	}
+	
+	if(!InputTag.MatchesTagExact(FBattleMageGameplayTags::Get().InputTag_LMB))
+	{
+		if(GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
+		return;
+	}
+	
+	if(GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
 }
 
 void ABMPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	if(GetASC() == nullptr) return;
-	GetASC()->AbilityInputTagHeld(InputTag);
+	if(GetASC() && GetASC()->HasMatchingGameplayTag(FBattleMageGameplayTags::Get().Player_Block_InputHeld))
+	{
+		return;
+	}
+	if(!InputTag.MatchesTagExact(FBattleMageGameplayTags::Get().InputTag_LMB))
+	{
+		if(GetASC())GetASC()->AbilityInputTagHeld(InputTag);
+		return;
+	}
 }
 
 UBMAbilitySystemComponent* ABMPlayerController::GetASC()
@@ -96,27 +121,33 @@ void ABMPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	UBMInputComponent* BattleMageInputComponent = CastChecked<UBMInputComponent>(InputComponent);
 
-	EnhancedInputComponent->BindAction(
+	BattleMageInputComponent->BindAbilityActions(
+		InputConfig, this,
+		&ThisClass::AbilityInputTagPressed,
+		&ThisClass::AbilityInputTagReleased,
+		&ThisClass::AbilityInputTagHeld);
+	
+	BattleMageInputComponent->BindAction(
 		MoveAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Move);
-	EnhancedInputComponent->BindAction(
+	BattleMageInputComponent->BindAction(
 		LookAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Look);
-	EnhancedInputComponent->BindAction(
+	BattleMageInputComponent->BindAction(
 		JumpAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Jump);
-	EnhancedInputComponent->BindAction(
+	BattleMageInputComponent->BindAction(
 		EquipAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Equip);
-	EnhancedInputComponent->BindAction(
+	BattleMageInputComponent->BindAction(
 		ShiftPressed,ETriggerEvent::Started,this,&ABMPlayerController::StartSprint);
-	EnhancedInputComponent->BindAction(
+	BattleMageInputComponent->BindAction(
 		ShiftPressed,ETriggerEvent::Completed,this,&ABMPlayerController::StopSprint);
-	EnhancedInputComponent->BindAction(
+	BattleMageInputComponent->BindAction(
 		CrouchAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Crouch);
-	EnhancedInputComponent->BindAction(
+	BattleMageInputComponent->BindAction(
 		SlideAction,ETriggerEvent::Started,this,&ABMPlayerController::Slide);
-	EnhancedInputComponent->BindAction(
+	BattleMageInputComponent->BindAction(
 		SlideAction,ETriggerEvent::Completed,this,&ABMPlayerController::SlideReleased);
-	EnhancedInputComponent->BindAction(
+	BattleMageInputComponent->BindAction(
 		AttackAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Attack);
 }
 void ABMPlayerController::Move(const FInputActionValue& Value)
@@ -219,6 +250,7 @@ void ABMPlayerController::Attack(const FInputActionValue& Value)
 {
 	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
+		ControlledCharacter->Attack();
 	}
 }
 

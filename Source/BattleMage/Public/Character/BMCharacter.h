@@ -44,6 +44,10 @@ public:
 	bool IsWeaponEquipped();
 	bool CanAttack();
 
+	void Attack();
+	void IncrementAttack(int32 CurrentAttack = 0);
+	void PlayAttackMontage(int32 CurrentAttack = 0);
+	
 	/*Character*/
 	void RotateInPlace(float DeltaTime);
 	bool IsCrouching();

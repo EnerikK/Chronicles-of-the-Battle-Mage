@@ -37,11 +37,16 @@ struct FBattleMageGameplayTags
 	FGameplayTag InputTag_3;
 	FGameplayTag InputTag_4;
 
+
 	FGameplayTag CombatSocket_Weapon;
 	FGameplayTag CombatSocket_RightHand;
 	FGameplayTag CombatSocket_LeftHand;
 
 	FGameplayTag Player_Block_CursorTrace;
+	FGameplayTag Player_Block_InputHeld;
+	FGameplayTag Player_Block_InputReleased;
+	FGameplayTag Player_Block_InputPressed;
+
 
 
 private:

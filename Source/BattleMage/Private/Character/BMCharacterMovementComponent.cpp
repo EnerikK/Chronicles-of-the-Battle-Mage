@@ -41,6 +41,7 @@ void UBmCharacterMovementComponent::SlidePressed()
 	if(CurrentTime - SlideStartTime >= Slide_CooldownDuration)
 	{
 		bWantsToSlide = true;
+		SetCollisionSizeToSliding(SlideHalfHeight);
 	}
 	else
 	{
@@ -213,6 +214,11 @@ void UBmCharacterMovementComponent::UpdateCharacterStateBeforeMovement(float Del
 			UE_LOG(LogTemp,Warning,TEXT("Client Tried to cheat"))
 		}
 	}
+	if(IsSliding() && !bWantsToSlide)
+	{
+		SlideReleased();
+	}
+		
 	/*try Mantle*/
 	if(PlayerCharacter->bPressedBattleMageJump)
 	{
@@ -281,6 +287,107 @@ FVector UBmCharacterMovementComponent::GetMantleStartLocation(FHitResult FrontHi
 {
 	return FVector::ZeroVector;
 }
+void UBmCharacterMovementComponent::SetCollisionSizeToSliding(float Size)
+{
+	const float ComponentScale = CharacterOwner->GetCapsuleComponent()->GetShapeScale();
+	const float OldUnscaledHalfHeight = CharacterOwner->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+	const float OldUnscaledRadius = CharacterOwner->GetCapsuleComponent()->GetUnscaledCapsuleRadius();
+
+	const float ClampedCrouchedHalfHeight = FMath::Max3(0.f,OldUnscaledRadius,Size);
+	float HalfHeightAdjust = (OldUnscaledHalfHeight - ClampedCrouchedHalfHeight);
+	float ScaledHalfHeightAdjust = HalfHeightAdjust * ComponentScale;
+	CharacterOwner->GetCapsuleComponent()->SetCapsuleSize(OldUnscaledRadius,ClampedCrouchedHalfHeight);
+	if (bCrouchMaintainsBaseLocation)
+	{
+		// Intentionally not using MoveUpdatedComponent, where a horizontal plane constraint would prevent the base of the capsule from staying at the same spot.
+		UpdatedComponent->MoveComponent
+			(FVector(0.f,0.f, -(HalfHeightAdjust * ComponentScale)),
+			UpdatedComponent->GetComponentQuat(),
+			true,
+			nullptr, EMoveComponentFlags::MOVECOMP_NoFlags,
+			ETeleportType::TeleportPhysics);
+	}
+	bForceNextFloorCheck = true;
+
+	// OnStartCrouch takes the change from the Default size, not the current one (though they are usually the same).
+	ACharacter* DefaultCharacter = CharacterOwner->GetClass()->GetDefaultObject<ACharacter>();
+	HalfHeightAdjust = (DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() - ClampedCrouchedHalfHeight);
+
+	AdjustProxyCapsuleSize();
+	CharacterOwner->OnStartCrouch( HalfHeightAdjust, HalfHeightAdjust * ComponentScale);
+}
+
+bool UBmCharacterMovementComponent::RestoreDefaultCollision()
+{
+	ACharacter* DefaultCharacter = CharacterOwner->GetClass()->GetDefaultObject<ACharacter>();
+	const float ComponentScale = CharacterOwner->GetCapsuleComponent()->GetShapeScale();
+	const float OldUnscaledHalfHeight = CharacterOwner->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+	const float HalfHeightAdjust = DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() - OldUnscaledHalfHeight;
+	const float ScaledHalfHeightAdjust = HalfHeightAdjust * ComponentScale;
+	const FVector PawnLocation = UpdatedComponent->GetComponentLocation();
+
+	const UWorld* MyWorld = GetWorld();
+	constexpr float SweepInflation = UE_KINDA_SMALL_NUMBER * 10.f;
+	FCollisionQueryParams CapsuleParams(SCENE_QUERY_STAT(CrouchTrace), false, CharacterOwner);
+	FCollisionResponseParams ResponseParam;
+	InitCollisionParams(CapsuleParams, ResponseParam);
+
+	// Compensate for the difference between current capsule size and standing size
+	const FCollisionShape StandingCapsuleShape = GetPawnCapsuleCollisionShape(SHRINK_HeightCustom, -SweepInflation - ScaledHalfHeightAdjust); // Shrink by negative amount, so actually grow it.
+	const ECollisionChannel CollisionChannel = UpdatedComponent->GetCollisionObjectType();
+	bool bEncroached = true;
+
+	if (!bCrouchMaintainsBaseLocation)
+		{
+			// Expand in place
+			bEncroached = MyWorld->OverlapBlockingTestByChannel(PawnLocation, FQuat::Identity, CollisionChannel, StandingCapsuleShape, CapsuleParams, ResponseParam);
+		
+			if (bEncroached)
+			{
+				// Try adjusting capsule position to see if we can avoid encroachment.
+				if (ScaledHalfHeightAdjust > 0.f)
+				{
+					// Shrink to a short capsule, sweep down to base to find where that would hit something, and then try to stand up from there.
+					float PawnRadius, PawnHalfHeight;
+					CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleSize(PawnRadius, PawnHalfHeight);
+					const float ShrinkHalfHeight = PawnHalfHeight - PawnRadius;
+					const float TraceDist = PawnHalfHeight - ShrinkHalfHeight;
+					const FVector Down = FVector(0.f, 0.f, -TraceDist);
+
+					FHitResult Hit(1.f);
+					const FCollisionShape ShortCapsuleShape = GetPawnCapsuleCollisionShape(SHRINK_HeightCustom, ShrinkHalfHeight);
+					const bool bBlockingHit = MyWorld->SweepSingleByChannel(Hit, PawnLocation, PawnLocation + Down, FQuat::Identity, CollisionChannel, ShortCapsuleShape, CapsuleParams);
+					if (Hit.bStartPenetrating)
+					{
+						bEncroached = true;
+					}
+					else
+					{
+						// Compute where the base of the sweep ended up, and see if we can stand there
+						const float DistanceToBase = (Hit.Time * TraceDist) + ShortCapsuleShape.Capsule.HalfHeight;
+						const FVector NewLoc = FVector(PawnLocation.X, PawnLocation.Y, PawnLocation.Z - DistanceToBase + StandingCapsuleShape.Capsule.HalfHeight + SweepInflation + MIN_FLOOR_DIST / 2.f);
+						bEncroached = MyWorld->OverlapBlockingTestByChannel(NewLoc, FQuat::Identity, CollisionChannel, StandingCapsuleShape, CapsuleParams, ResponseParam);
+						if (!bEncroached)
+						{
+							// Intentionally not using MoveUpdatedComponent, where a horizontal plane constraint would prevent the base of the capsule from staying at the same spot.
+							UpdatedComponent->MoveComponent(NewLoc - PawnLocation, UpdatedComponent->GetComponentQuat(), false, nullptr, EMoveComponentFlags::MOVECOMP_NoFlags, ETeleportType::TeleportPhysics);
+						}
+					}
+				}
+			}
+		}
+	if(bEncroached)
+	{
+		return false;
+	}
+	CharacterOwner->GetCapsuleComponent()->SetCapsuleSize(DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleRadius(), DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight(), true);
+
+	const float MeshAdjust = ScaledHalfHeightAdjust;
+	AdjustProxyCapsuleSize();
+	CharacterOwner->OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+	return true;
+}
+
 
 #pragma region Helpers
 bool UBmCharacterMovementComponent::IsServer() const

@@ -76,6 +76,8 @@ class BATTLEMAGE_API UBmCharacterMovementComponent : public UCharacterMovementCo
 	float Slide_CooldownDuration = 1.3;
 	UPROPERTY(EditDefaultsOnly)
 	float AuthSlideCooldownDuration= 3.9f;
+	UPROPERTY(EditDefaultsOnly)
+	float SlideHalfHeight = 55.f;
 
 	/*Mantle*/
 	UPROPERTY(EditDefaultsOnly)
@@ -167,6 +169,9 @@ protected:
 	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
 	virtual void UpdateCharacterStateBeforeMovement(float DeltaSeconds) override;
 	virtual void UpdateCharacterStateAfterMovement(float DeltaSeconds) override;
+	
+	void SetCollisionSizeToSliding(float Size);
+	bool RestoreDefaultCollision();
 
 private:
 

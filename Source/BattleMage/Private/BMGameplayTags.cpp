@@ -102,5 +102,18 @@ void FBattleMageGameplayTags::InitializeNativeGameplayTags()
 	(FName("Player.Block.CursorTrace"),
 	FString("Block The trace under the cursor"));
 
+	GameplayTags.Player_Block_InputHeld = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("Player.Block.InputHeld"),
+	FString("Block The InputHeld buttons"));
+	
+	GameplayTags.Player_Block_InputReleased = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("Player.Block.InputReleased"),
+	FString("Block The InputReleased buttons"));
+
+		
+	GameplayTags.Player_Block_InputPressed = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("Player.Block.InputPressed"),
+	FString("Block The Input pressed buttons"));
+
 	
 }
