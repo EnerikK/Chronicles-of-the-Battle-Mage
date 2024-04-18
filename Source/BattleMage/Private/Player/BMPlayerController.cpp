@@ -250,7 +250,7 @@ void ABMPlayerController::Attack(const FInputActionValue& Value)
 {
 	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
-		ControlledCharacter->Attack();
+		/*ControlledCharacter->Attack();*/
 	}
 }
 

@@ -50,14 +50,9 @@ public:
 
 	FORCEINLINE USphereComponent* GetPickUpSphere() const {return PickUpSphere;}
 	FORCEINLINE EWeaponType GetWeaponType() const {return WeaponType;}
-	FORCEINLINE UAnimMontage* GetAttackMontage1() const  {return AttackMontage1;}
-	FORCEINLINE UAnimMontage* GetAttackMontage2() const  {return AttackMontage2;}
-	FORCEINLINE UAnimMontage* GetAttackMontage3() const  {return AttackMontage3;}
-	FORCEINLINE UAnimMontage* GetAttackMontage4() const  {return AttackMontage4;}
-
-
-
-
+	
+	UPROPERTY(EditDefaultsOnly)
+	TArray<UAnimMontage* > AttackMontages;
 
 	
 	/*
@@ -121,18 +116,5 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	EWeaponType WeaponType;
-
-	UPROPERTY(EditDefaultsOnly,Category="Combat")
-	UAnimMontage* AttackMontage1;
-
-	UPROPERTY(EditDefaultsOnly,Category="Combat")
-	UAnimMontage* AttackMontage2;
-
-	UPROPERTY(EditDefaultsOnly,Category="Combat")
-	UAnimMontage* AttackMontage3;
-
-	UPROPERTY(EditDefaultsOnly,Category="Combat")
-	UAnimMontage* AttackMontage4;
-
-
+	
 };

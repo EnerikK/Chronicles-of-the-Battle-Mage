@@ -7,9 +7,11 @@
 #include "BMCharacterMovementComponent.h"
 #include "Character/BMCharacterBase.h"
 #include "HUD/BMHud.h"
+#include "Types/CombatState.h"
 #include "Types/TurnInPlace.h"
 #include "BMCharacter.generated.h"
 
+enum class ECombatState : uint8;
 class ABMPlayerState;
 class UBmCharacterMovementComponent;
 class AWeapon;
@@ -42,11 +44,11 @@ public:
 	void AttackButtonPressed(int32 IncrementAttack);
 	AWeapon* GetEquippedWeapon();
 	bool IsWeaponEquipped();
-	bool CanAttack();
+	
+	bool IsStateEqualTo();
 
-	void Attack();
-	void IncrementAttack(int32 CurrentAttack = 0);
-	void PlayAttackMontage(int32 CurrentAttack = 0);
+	/*Attacking*/
+	bool IsAttacking = false;
 	
 	/*Character*/
 	void RotateInPlace(float DeltaTime);

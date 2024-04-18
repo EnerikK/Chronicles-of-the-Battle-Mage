@@ -3,6 +3,7 @@
 
 #include "Character/BMCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "AnalyticsEventAttribute.h"
 #include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Character/BMCharacterMovementComponent.h"
@@ -11,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Interaction/CombatComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/BMPlayerController.h"
@@ -18,19 +20,19 @@
 #include "Weapon/Weapon.h"
 
 ABMCharacter::ABMCharacter(const FObjectInitializer& ObjectInitializer)
-:Super(ObjectInitializer.SetDefaultSubobjectClass<UBmCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
-
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UBmCharacterMovementComponent>(
+		  ACharacter::CharacterMovementComponentName))
 {
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoom");
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->bDoCollisionTest = false;
-	
+
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
-	CameraComponent->SetupAttachment(CameraBoom,USpringArmComponent::SocketName);
+	CameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	CameraComponent->bUsePawnControlRotation = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0,400.f,0.f);
+	GetCharacterMovement()->RotationRate = FRotator(0, 400.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
@@ -40,12 +42,13 @@ ABMCharacter::ABMCharacter(const FObjectInitializer& ObjectInitializer)
 
 	BMCharacterMovementComponent = Cast<UBmCharacterMovementComponent>(GetCharacterMovement());
 	BMCharacterMovementComponent->SetIsReplicated(true);
-	
+
 	Combat = CreateDefaultSubobject<UCombatComponent>("Combat");
 	Combat->SetIsReplicated(true);
 
 	TurningInPlace = ETurnInPlace::ETurnIP_NotTurning;
 }
+
 void ABMCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -156,43 +159,6 @@ AWeapon* ABMCharacter::GetEquippedWeapon()
 bool ABMCharacter::IsWeaponEquipped()
 {
 	return (Combat && Combat->EquippedWeapon);
-}
-
-bool ABMCharacter::CanAttack()
-{
-	return (Combat && Combat->EquippedWeapon);
-}
-
-void ABMCharacter::Attack()
-{
-	if(CanAttack())
-	{
-		int32 CurrentAttack = 1;
-		for(int i = 1; i < 5; ++i)
-		{
-			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-			if(AnimInstance)
-			{
-				AnimInstance->Montage_Play(Combat->EquippedWeapon->GetAttackMontage1());
-			}
-			IncrementAttack(CurrentAttack);
-		}
-	}
-}
-
-void ABMCharacter::IncrementAttack(int32 CurrentAttack)
-{
-	CurrentAttack += 1;
-}
-
-void ABMCharacter::PlayAttackMontage(int32 CurrentAttack)
-{
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance)
-	{
-		AnimInstance->Montage_Play(Combat->EquippedWeapon->GetAttackMontage1());
-	}
-	
 }
 
 void ABMCharacter::ServerEquipButtonPressed_Implementation()
