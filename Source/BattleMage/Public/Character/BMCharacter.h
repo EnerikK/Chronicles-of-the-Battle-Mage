@@ -41,22 +41,33 @@ public:
 	/*Weapons*/
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	void EquipButtonPressed();
-	void AttackButtonPressed(int32 IncrementAttack);
 	AWeapon* GetEquippedWeapon();
 	bool IsWeaponEquipped();
-	
-	bool IsStateEqualTo();
+	UPROPERTY(BlueprintReadWrite)
+	bool bFinishedSwapping = true;
+	void PlaySwapMontage();
 
-	/*Attacking*/
+	/*States*/
+	ECombatState CurrentState;
+	UFUNCTION(BlueprintCallable)
+	void SetStateInCode(ECombatState NewState);
+	UFUNCTION(BlueprintCallable,BlueprintPure)
+	bool IsStateEqualToAnyInCode(TArray<ECombatState> StatesToCheck);
+	/*Attack*/
+	UPROPERTY(BlueprintReadWrite)
+	int32 AttackIndexInCode = 0;
+	UFUNCTION(BlueprintCallable)
+	bool PerformLightAttackInCode(int32 CurrentAttackIndex);
+	UFUNCTION(BlueprintCallable)
+	void AttackEvent();
 	bool IsAttacking = false;
+	void SwapWeaponTimerFinished();
 	
 	/*Character*/
 	void RotateInPlace(float DeltaTime);
 	bool IsCrouching();
 	bool IsSliding();
 	bool bPressedBattleMageJump;
-
-	
 	virtual void Jump() override;
 	virtual void StopJumping() override;
 
@@ -71,6 +82,7 @@ public:
 	FORCEINLINE UBmCharacterMovementComponent* GetBMCharacterComponent() const {return BMCharacterMovementComponent;}
 	FORCEINLINE UAnimMontage* GetSlideMontage() const {return SlideMontage;}
 	FORCEINLINE UAnimMontage* GetSwordPickUpMontage() const {return SwordPickUpMontage;}
+	FORCEINLINE UAnimMontage* GetWeaponSwapMontage() const {return WeaponSwapMontage;}
 
 
 protected:
@@ -128,5 +140,8 @@ private:
 
 	UPROPERTY(EditAnywhere , Category= "Combat")
 	UAnimMontage* SwordPickUpMontage;
+
+	UPROPERTY(EditAnywhere , Category= "Combat")
+	UAnimMontage* WeaponSwapMontage;
 	
 };

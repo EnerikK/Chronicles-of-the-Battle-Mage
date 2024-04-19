@@ -74,7 +74,33 @@ bool UCombatComponent::bShouldSwapWeapon()
 
 void UCombatComponent::SwapWeapon()
 {
+	if(CombatState != ECombatState::ECState_Unoccupied || Character == nullptr || !Character->HasAuthority()) return;
 	
+	Character->PlaySwapMontage();
+	CombatState = ECombatState::ECState_SwapWeapons;
+	Character->bFinishedSwapping = false;
+}
+
+void UCombatComponent::FinishSwap()
+{
+	if(Character && Character->HasAuthority())
+	{
+		CombatState = ECombatState::ECState_Unoccupied;
+	}
+	if(Character) Character->bFinishedSwapping = true;
+}
+
+void UCombatComponent::FinishSwapWeapon()
+{
+	AWeapon* CurrentWeapon = EquippedWeapon;
+	EquippedWeapon = SecondaryWeapon;
+	SecondaryWeapon = CurrentWeapon;
+
+	EquippedWeapon->SetWeaponState(EWeaponState::EW_Equipped);
+	AttachActorToRightHand(EquippedWeapon);
+
+	SecondaryWeapon->SetWeaponState(EWeaponState::EW_EquippedSecondary);
+	AttachActorToBackPack(SecondaryWeapon);
 }
 
 void UCombatComponent::TraceUnderCrosshair(FHitResult& TraceHitResult)
@@ -247,15 +273,22 @@ void UCombatComponent::OnRep_CombatState()
 		if(Character && !Character->IsLocallyControlled())
 		break;
 	case ECombatState::ECState_Unoccupied:
-		/*if(bFireButtonPressed)
+		if(Character)
 		{
-			Fire();
-		}*/
+			Character->AttackIndexInCode = 0;
+			UE_LOG(LogTemp,Warning,TEXT("CurrentState : Unoccupied");
+		}
 			break;
 	case ECombatState::ECState_ThrowGrenade:
 		if(Character && !Character->IsLocallyControlled())
 		{
 			AttachActorToLeftHand(EquippedWeapon);
+		}
+		break;
+	case ECombatState::ECState_SwapWeapons:
+		if(Character && !Character->IsLocallyControlled())
+		{
+			Character->PlaySwapMontage();
 		}
 		break;
 	}

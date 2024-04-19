@@ -66,6 +66,11 @@ void ABMCharacter::PossessedBy(AController* NewController)
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
 }
+
+void ABMCharacter::SwapWeaponTimerFinished()
+{
+}
+
 void ABMCharacter::RotateInPlace(float DeltaTime)
 {
 	if(Combat && Combat->EquippedWeapon)
@@ -136,21 +141,15 @@ void ABMCharacter::EquipButtonPressed()
 {
 	if(Combat)
 	{
-		if(Combat->CombatState == ECombatState::ECState_Unoccupied)
+		if(Combat->CombatState == ECombatState::ECState_Unoccupied) ServerEquipButtonPressed();
+		if(Combat->bShouldSwapWeapon() && !HasAuthority() && Combat->CombatState == ECombatState::ECState_Unoccupied && OverlappingWeapon == nullptr)
 		{
-			ServerEquipButtonPressed();
-		}
-		if(!HasAuthority() && Combat->CombatState == ECombatState::ECState_Unoccupied && OverlappingWeapon == nullptr)
-		{
+			PlaySwapMontage();
 			Combat->CombatState = ECombatState::ECState_SwapWeapons;
+			bFinishedSwapping = false;
 		}
 	}
 }
-
-void ABMCharacter::AttackButtonPressed(int32 IncrementAttack)
-{
-}
-
 AWeapon* ABMCharacter::GetEquippedWeapon()
 {
 	if(Combat == nullptr) return nullptr;
@@ -159,6 +158,59 @@ AWeapon* ABMCharacter::GetEquippedWeapon()
 bool ABMCharacter::IsWeaponEquipped()
 {
 	return (Combat && Combat->EquippedWeapon);
+}
+
+void ABMCharacter::PlaySwapMontage()
+{
+	if(Combat == nullptr || Combat->EquippedWeapon == nullptr) return;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance && WeaponSwapMontage)
+	{
+		AnimInstance->Montage_Play(WeaponSwapMontage);
+	}
+}
+
+void ABMCharacter::SetStateInCode(ECombatState NewState)
+{
+	if(NewState != CurrentState)
+	{
+		CurrentState = NewState;
+	}
+}
+
+bool ABMCharacter::IsStateEqualToAnyInCode(TArray<ECombatState> StatesToCheck)
+{
+	if(StatesToCheck.Contains(CurrentState))
+	{
+		return true;
+	}
+	return false;
+}
+
+bool ABMCharacter::PerformLightAttackInCode(int32 CurrentAttackIndex)
+{
+	AttackIndexInCode = CurrentAttackIndex;
+	if(IsWeaponEquipped() && Combat->CombatState == ECombatState::ECState_Unoccupied)
+	{
+		UAnimMontage* LightAttackMontage = Combat->EquippedWeapon->AttackMontages[AttackIndexInCode];
+		if(LightAttackMontage)
+		{
+			SetStateInCode(ECombatState::ECState_Attack);
+			PlayAnimMontage(LightAttackMontage,1.f);
+			AttackIndexInCode++;
+			if(AttackIndexInCode >=  Combat->EquippedWeapon->AttackMontages.Num())
+			{
+				AttackIndexInCode = 0;
+				return true;
+			}
+			return false;
+		}
+	}
+	return false;
+}
+
+void ABMCharacter::AttackEvent()
+{
 }
 
 void ABMCharacter::ServerEquipButtonPressed_Implementation()
@@ -264,7 +316,7 @@ void ABMCharacter::AimOffset(float DeltaTime)
 }
 void ABMCharacter::TurnInPlace(float DeltaTime)
 {
-	UE_LOG(LogTemp,Warning,TEXT("AO_YAW : %f"),AO_Yaw);
+	//UE_LOG(LogTemp,Warning,TEXT("AO_YAW : %f"),AO_Yaw);
 	if(AO_Yaw > 90.f)
 	{
 		TurningInPlace = ETurnInPlace::ETurnIP_Right;

@@ -80,6 +80,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> AttackAction;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> WeaponSwapAction;
 	
 	
 	void Move(const FInputActionValue& Value);
@@ -92,6 +95,7 @@ private:
 	void Slide(const FInputActionValue& Value);
 	void SlideReleased(const FInputActionValue& Value);
 	void Attack(const FInputActionValue& Value);
+	void Swap(const FInputActionValue& Value);
 
 	
 };

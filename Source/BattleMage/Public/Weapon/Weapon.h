@@ -46,7 +46,6 @@ public:
 	void SetWeaponState(EWeaponState State);
 	virtual void OnRep_Owner() override;
 	virtual void Dropped();
-	void SetHudAmmo();
 
 	FORCEINLINE USphereComponent* GetPickUpSphere() const {return PickUpSphere;}
 	FORCEINLINE EWeaponType GetWeaponType() const {return WeaponType;}

@@ -27,12 +27,16 @@ public:
 	friend ABMCharacter;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	
 	void EquipWeapon(AWeapon* WeaponToEquip);
 	bool bShouldSwapWeapon();
 	void SwapWeapon();
-
-
+	UFUNCTION(BlueprintCallable)
+	void FinishSwap();
+	UFUNCTION(BlueprintCallable)
+	void FinishSwapWeapon();
+	
 	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;

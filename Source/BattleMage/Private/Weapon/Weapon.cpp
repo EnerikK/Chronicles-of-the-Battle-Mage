@@ -65,9 +65,6 @@ void AWeapon::OnRep_Owner()
 		PlayerController = nullptr;
 	}
 }
-void AWeapon::SetHudAmmo()
-{
-}
 void AWeapon::Dropped()
 {
 	SetWeaponState(EWeaponState::EW_Dropped);
