@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "BMPlayerController.generated.h"
 
+class UCombatComponent;
 class UBMInputConfig;
 struct FGameplayTag;
 class UBMAbilitySystemComponent;
@@ -28,6 +29,8 @@ public:
 	ABMPlayerController();
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void OnPossess(APawn* InPawn) override;
+	virtual void PostInitializeComponents() override;
+
 
 protected:
 
@@ -35,7 +38,10 @@ protected:
 	virtual void SetupInputComponent() override;
 
 private:
-	
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,meta = (AllowPrivateAccess = true))
+	UCombatComponent* Combat;
+
 	UBMAbilitySystemComponent* GetASC();
 
 	UPROPERTY(EditDefaultsOnly,Category="Input")
@@ -82,6 +88,9 @@ private:
 	TObjectPtr<UInputAction> AttackAction;
 
 	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> HeavyAttackAction;
+
+	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> WeaponSwapAction;
 	
 	
@@ -95,6 +104,7 @@ private:
 	void Slide(const FInputActionValue& Value);
 	void SlideReleased(const FInputActionValue& Value);
 	void Attack(const FInputActionValue& Value);
+	void HeavyAttack(const FInputActionValue& Value);
 	void Swap(const FInputActionValue& Value);
 
 	

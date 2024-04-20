@@ -25,6 +25,7 @@ class BATTLEMAGE_API UCombatComponent : public UActorComponent
 public:
 	UCombatComponent();
 	friend ABMCharacter;
+	friend ABMPlayerController;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

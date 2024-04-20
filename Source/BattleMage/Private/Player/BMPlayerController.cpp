@@ -20,6 +20,8 @@
 ABMPlayerController::ABMPlayerController()
 {
 	bReplicates = true;
+	Combat = CreateDefaultSubobject<UCombatComponent>("CombatComponent");
+	Combat->SetIsReplicated(true);
 }
 
 void ABMPlayerController::Tick(float DeltaSeconds)
@@ -31,6 +33,15 @@ void ABMPlayerController::Tick(float DeltaSeconds)
 void ABMPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+}
+
+void ABMPlayerController::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if(Combat)
+	{
+		Combat->Controller = this;
+	}
 }
 
 void ABMPlayerController::BeginPlay()
@@ -148,7 +159,9 @@ void ABMPlayerController::SetupInputComponent()
 	BattleMageInputComponent->BindAction(
 		SlideAction,ETriggerEvent::Completed,this,&ABMPlayerController::SlideReleased);
 	BattleMageInputComponent->BindAction(
-		AttackAction,ETriggerEvent::Triggered,this,&ABMPlayerController::Attack);
+		AttackAction,ETriggerEvent::Started,this,&ABMPlayerController::Attack);
+	BattleMageInputComponent->BindAction(
+		HeavyAttackAction,ETriggerEvent::Started,this,&ABMPlayerController::HeavyAttack);
 }
 void ABMPlayerController::Move(const FInputActionValue& Value)
 {
@@ -250,7 +263,25 @@ void ABMPlayerController::Attack(const FInputActionValue& Value)
 {
 	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
-		
+		ControlledCharacter->bSaveHeavyAttack = false;
+		if(Combat->CombatState == ECombatState::ECState_Attack)
+		{
+			ControlledCharacter->bSaveLightAttack = true;
+		}
+		ControlledCharacter->AttackEvent();
+	}
+}
+
+void ABMPlayerController::HeavyAttack(const FInputActionValue& Value)
+{
+	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
+	{
+		ControlledCharacter->bSaveLightAttack = false;
+		if(Combat->CombatState == ECombatState::ECState_Attack)
+		{
+			ControlledCharacter->bSaveHeavyAttack = true;
+		}
+		ControlledCharacter->HeavyAttackEvent();
 	}
 }
 

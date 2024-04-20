@@ -276,7 +276,7 @@ void UCombatComponent::OnRep_CombatState()
 		if(Character)
 		{
 			Character->AttackIndexInCode = 0;
-			UE_LOG(LogTemp,Warning,TEXT("CurrentState : Unoccupied");
+			UE_LOG(LogTemp,Warning,TEXT("Unoccupiead"));
 		}
 			break;
 	case ECombatState::ECState_ThrowGrenade:

@@ -195,8 +195,13 @@ bool ABMCharacter::PerformLightAttackInCode(int32 CurrentAttackIndex)
 		UAnimMontage* LightAttackMontage = Combat->EquippedWeapon->AttackMontages[AttackIndexInCode];
 		if(LightAttackMontage)
 		{
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			if(AnimInstance)
+			{
+				AnimInstance->Montage_Play(LightAttackMontage,0.7);
+			}
+			//PlayAnimMontage(LightAttackMontage);
 			SetStateInCode(ECombatState::ECState_Attack);
-			PlayAnimMontage(LightAttackMontage,1.f);
 			AttackIndexInCode++;
 			if(AttackIndexInCode >=  Combat->EquippedWeapon->AttackMontages.Num())
 			{
@@ -209,8 +214,86 @@ bool ABMCharacter::PerformLightAttackInCode(int32 CurrentAttackIndex)
 	return false;
 }
 
+bool ABMCharacter::PerformHeavyAttackInCode(int32 CurrentAttackIndex)
+{
+	HeavyAttackIndexInCode = CurrentAttackIndex;
+	if(IsWeaponEquipped() && Combat->CombatState == ECombatState::ECState_Unoccupied)
+	{
+		UAnimMontage* HeavyAttackMontage = Combat->EquippedWeapon->HeavyAttackMontages[HeavyAttackIndexInCode];
+		if(HeavyAttackMontage)
+		{
+			SetStateInCode(ECombatState::ECState_Attack);
+			PlayAnimMontage(HeavyAttackMontage,0.9);
+			HeavyAttackIndexInCode++;
+			if(HeavyAttackIndexInCode >=  Combat->EquippedWeapon->HeavyAttackMontages.Num())
+			{
+				HeavyAttackIndexInCode = 0;
+				return true;
+			}
+			return false;
+		}
+	}
+	return false;
+}
+
 void ABMCharacter::AttackEvent()
 {
+	if(Combat->CombatState != ECombatState::ECState_Attack)
+	{
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle,this,&ABMCharacter::TimerBeforePressingAgain,0.8f);
+		PerformLightAttackInCode(AttackIndexInCode);
+	}
+}
+
+void ABMCharacter::HeavyAttackEvent()
+{
+	if(Combat->CombatState != ECombatState::ECState_Attack)
+	{
+		PerformHeavyAttackInCode(HeavyAttackIndexInCode);
+	}
+}
+
+void ABMCharacter::ResetValues()
+{
+	SetStateInCode(ECombatState::ECState_Unoccupied);
+	AttackIndexInCode = 0;
+	HeavyAttackIndexInCode = 0;
+	bSaveLightAttack = false;
+	bSaveHeavyAttack = false;
+}
+
+void ABMCharacter::SaveLightAttack()
+{
+	if(bSaveLightAttack)
+	{
+		bSaveLightAttack = false;
+		if(Combat->CombatState == ECombatState::ECState_Attack)
+		{
+			SetStateInCode(ECombatState::ECState_Unoccupied);
+			AttackEvent();
+		}
+		AttackEvent();
+	}
+}
+
+void ABMCharacter::SaveHeavyAttack()
+{
+	if(!bSaveHeavyAttack)
+	{
+		bSaveHeavyAttack = false;
+		if(Combat->CombatState == ECombatState::ECState_Attack)
+		{
+			SetStateInCode(ECombatState::ECState_Unoccupied);
+			HeavyAttackEvent();
+		}
+		
+	}
+}
+
+void ABMCharacter::TimerBeforePressingAgain()
+{
+	
 }
 
 void ABMCharacter::ServerEquipButtonPressed_Implementation()
@@ -221,7 +304,7 @@ void ABMCharacter::ServerEquipButtonPressed_Implementation()
 		{
 			Combat->EquipWeapon(OverlappingWeapon);
 		}
-		else if (Combat->bShouldSwapWeapon())
+		else if (Combat->bShouldSwapWeapon() && Combat->CombatState != ECombatState::ECState_Attack)
 		{
 			Combat->SwapWeapon();
 		}

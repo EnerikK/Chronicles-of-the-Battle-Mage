@@ -53,6 +53,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TArray<UAnimMontage* > AttackMontages;
 
+	UPROPERTY(EditDefaultsOnly)
+	TArray<UAnimMontage* > HeavyAttackMontages;
+
 	
 	/*
 	* Texture for the cross-hairs

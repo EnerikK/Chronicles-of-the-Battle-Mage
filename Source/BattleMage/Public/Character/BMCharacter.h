@@ -56,10 +56,27 @@ public:
 	/*Attack*/
 	UPROPERTY(BlueprintReadWrite)
 	int32 AttackIndexInCode = 0;
+	UPROPERTY(BlueprintReadWrite)
+	int32 HeavyAttackIndexInCode = 0;
+	UPROPERTY(BlueprintReadWrite)
+	bool bSaveLightAttack = false;
+	UPROPERTY(BlueprintReadWrite)
+	bool bSaveHeavyAttack = false;
 	UFUNCTION(BlueprintCallable)
 	bool PerformLightAttackInCode(int32 CurrentAttackIndex);
 	UFUNCTION(BlueprintCallable)
+	bool PerformHeavyAttackInCode(int32 CurrentAttackIndex);
+	UFUNCTION(BlueprintCallable)
 	void AttackEvent();
+	UFUNCTION(BlueprintCallable)
+	void HeavyAttackEvent();
+	UFUNCTION(BlueprintCallable)
+	void ResetValues();
+	UFUNCTION(BlueprintCallable)
+	void SaveLightAttack();
+	UFUNCTION(BlueprintCallable)
+	void SaveHeavyAttack();
+	void TimerBeforePressingAgain();
 	bool IsAttacking = false;
 	void SwapWeaponTimerFinished();
 	
