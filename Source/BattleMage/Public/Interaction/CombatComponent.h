@@ -11,6 +11,7 @@
 #define TRACE 80000.f
 
 
+class UBMGameplayAbility;
 class ABMCharacterBase;
 class AWeapon;
 class ABMHud;
@@ -26,6 +27,7 @@ public:
 	UCombatComponent();
 	friend ABMCharacter;
 	friend ABMPlayerController;
+	friend UBMGameplayAbility;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

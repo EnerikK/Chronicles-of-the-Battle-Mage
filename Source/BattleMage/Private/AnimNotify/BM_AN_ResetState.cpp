@@ -2,7 +2,6 @@
 
 
 #include "AnimNotify/BM_AN_ResetState.h"
-
 #include "Character/BMCharacter.h"
 
 void UBM_AN_ResetState::Received_Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
@@ -11,7 +10,7 @@ void UBM_AN_ResetState::Received_Notify(USkeletalMeshComponent* MeshComp, UAnimS
 	
 	if(MeshComp && MeshComp->GetOwner())
 	{
-		ControlledCharacter->ResetValues();
+		
 	}
 	
 }

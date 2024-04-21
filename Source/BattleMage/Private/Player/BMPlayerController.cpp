@@ -263,12 +263,6 @@ void ABMPlayerController::Attack(const FInputActionValue& Value)
 {
 	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
-		ControlledCharacter->bSaveHeavyAttack = false;
-		if(Combat->CombatState == ECombatState::ECState_Attack)
-		{
-			ControlledCharacter->bSaveLightAttack = true;
-		}
-		ControlledCharacter->AttackEvent();
 	}
 }
 
@@ -276,12 +270,6 @@ void ABMPlayerController::HeavyAttack(const FInputActionValue& Value)
 {
 	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
-		ControlledCharacter->bSaveLightAttack = false;
-		if(Combat->CombatState == ECombatState::ECState_Attack)
-		{
-			ControlledCharacter->bSaveHeavyAttack = true;
-		}
-		ControlledCharacter->HeavyAttackEvent();
 	}
 }
 

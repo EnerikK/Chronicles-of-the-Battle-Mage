@@ -66,11 +66,6 @@ void ABMCharacter::PossessedBy(AController* NewController)
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
 }
-
-void ABMCharacter::SwapWeaponTimerFinished()
-{
-}
-
 void ABMCharacter::RotateInPlace(float DeltaTime)
 {
 	if(Combat && Combat->EquippedWeapon)
@@ -198,7 +193,7 @@ bool ABMCharacter::PerformLightAttackInCode(int32 CurrentAttackIndex)
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			if(AnimInstance)
 			{
-				AnimInstance->Montage_Play(LightAttackMontage,0.7);
+				AnimInstance->Montage_Play(LightAttackMontage);
 			}
 			//PlayAnimMontage(LightAttackMontage);
 			SetStateInCode(ECombatState::ECState_Attack);
@@ -208,7 +203,7 @@ bool ABMCharacter::PerformLightAttackInCode(int32 CurrentAttackIndex)
 				AttackIndexInCode = 0;
 				return true;
 			}
-			return false;
+			return true;
 		}
 	}
 	return false;
@@ -217,20 +212,20 @@ bool ABMCharacter::PerformLightAttackInCode(int32 CurrentAttackIndex)
 bool ABMCharacter::PerformHeavyAttackInCode(int32 CurrentAttackIndex)
 {
 	HeavyAttackIndexInCode = CurrentAttackIndex;
-	if(IsWeaponEquipped() && Combat->CombatState == ECombatState::ECState_Unoccupied)
+	if(IsWeaponEquipped() && Combat->CombatState != ECombatState::ECState_HeavyAttack)
 	{
 		UAnimMontage* HeavyAttackMontage = Combat->EquippedWeapon->HeavyAttackMontages[HeavyAttackIndexInCode];
 		if(HeavyAttackMontage)
 		{
-			SetStateInCode(ECombatState::ECState_Attack);
-			PlayAnimMontage(HeavyAttackMontage,0.9);
+			SetStateInCode(ECombatState::ECState_HeavyAttack);
+			PlayAnimMontage(HeavyAttackMontage);
 			HeavyAttackIndexInCode++;
 			if(HeavyAttackIndexInCode >=  Combat->EquippedWeapon->HeavyAttackMontages.Num())
 			{
 				HeavyAttackIndexInCode = 0;
 				return true;
 			}
-			return false;
+			return true;
 		}
 	}
 	return false;
@@ -240,8 +235,6 @@ void ABMCharacter::AttackEvent()
 {
 	if(Combat->CombatState != ECombatState::ECState_Attack)
 	{
-		FTimerHandle TimerHandle;
-		GetWorldTimerManager().SetTimer(TimerHandle,this,&ABMCharacter::TimerBeforePressingAgain,0.8f);
 		PerformLightAttackInCode(AttackIndexInCode);
 	}
 }
@@ -253,16 +246,6 @@ void ABMCharacter::HeavyAttackEvent()
 		PerformHeavyAttackInCode(HeavyAttackIndexInCode);
 	}
 }
-
-void ABMCharacter::ResetValues()
-{
-	SetStateInCode(ECombatState::ECState_Unoccupied);
-	AttackIndexInCode = 0;
-	HeavyAttackIndexInCode = 0;
-	bSaveLightAttack = false;
-	bSaveHeavyAttack = false;
-}
-
 void ABMCharacter::SaveLightAttack()
 {
 	if(bSaveLightAttack)
@@ -279,23 +262,17 @@ void ABMCharacter::SaveLightAttack()
 
 void ABMCharacter::SaveHeavyAttack()
 {
-	if(!bSaveHeavyAttack)
+	if(bSaveHeavyAttack)
 	{
 		bSaveHeavyAttack = false;
 		if(Combat->CombatState == ECombatState::ECState_Attack)
 		{
-			SetStateInCode(ECombatState::ECState_Unoccupied);
 			HeavyAttackEvent();
+			SetStateInCode(ECombatState::ECState_Unoccupied);
 		}
-		
+		HeavyAttackEvent();
 	}
 }
-
-void ABMCharacter::TimerBeforePressingAgain()
-{
-	
-}
-
 void ABMCharacter::ServerEquipButtonPressed_Implementation()
 {
 	if(Combat)

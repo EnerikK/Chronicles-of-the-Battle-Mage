@@ -59,7 +59,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
 	UAnimMontage* GetHitReactMontage();
 
-private:
+	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable)
+	void SetInChargeLoop(bool bInLoop);
+
 
 	
 	

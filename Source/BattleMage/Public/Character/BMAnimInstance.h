@@ -33,7 +33,7 @@ private:
 	ABMPlayerController* PlayerController;
 
 	
-	UPROPERTY(BlueprintReadOnly,Category="Character",meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadWrite,Category="Character",meta=(AllowPrivateAccess = "true"))
 	ABMCharacter* Character;
 
 	UPROPERTY(BlueprintReadOnly,Category="Character",meta=(AllowPrivateAccess = "true"))

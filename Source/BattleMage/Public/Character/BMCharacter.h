@@ -53,6 +53,7 @@ public:
 	void SetStateInCode(ECombatState NewState);
 	UFUNCTION(BlueprintCallable,BlueprintPure)
 	bool IsStateEqualToAnyInCode(TArray<ECombatState> StatesToCheck);
+	
 	/*Attack*/
 	UPROPERTY(BlueprintReadWrite)
 	int32 AttackIndexInCode = 0;
@@ -71,14 +72,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void HeavyAttackEvent();
 	UFUNCTION(BlueprintCallable)
-	void ResetValues();
-	UFUNCTION(BlueprintCallable)
 	void SaveLightAttack();
 	UFUNCTION(BlueprintCallable)
 	void SaveHeavyAttack();
-	void TimerBeforePressingAgain();
-	bool IsAttacking = false;
-	void SwapWeaponTimerFinished();
+
+	/*Charge Attacks*/
+	
 	
 	/*Character*/
 	void RotateInPlace(float DeltaTime);
@@ -123,7 +122,7 @@ private:
 
 	virtual void InitAbilityActorInfo() override;
 	
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,meta = (AllowPrivateAccess = true))
 	UCombatComponent* Combat;
 
 	UPROPERTY(BlueprintReadOnly,EditDefaultsOnly,Category=Movement,meta=(AllowPrivateAccess = true))

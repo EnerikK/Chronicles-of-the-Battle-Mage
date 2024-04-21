@@ -10,6 +10,7 @@ enum class ECombatState : uint8
 	ECState_Reloading UMETA(DisplayName = "ThrowGrenade"),
 	ECState_Slide		 UMETA(DisplayName = "Slide"),
 	ECState_Attack		 UMETA(DisplayName = "Attack"),
+	ECState_HeavyAttack		 UMETA(DisplayName = "HeavyAttack"),
 	ECState_SwapWeapons	 UMETA(DisplayName = "SwapWeapons"),
 	
 	ECState_MAX UMETA(DisplayName = "DefaultMax"),
