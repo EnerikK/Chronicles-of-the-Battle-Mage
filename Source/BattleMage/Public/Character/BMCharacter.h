@@ -118,6 +118,9 @@ protected:
 	UPROPERTY()
 	ABMPlayerState* BMPlayerState;
 
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UCameraComponent> CameraComponent;
+
 private:
 
 	virtual void InitAbilityActorInfo() override;
@@ -145,8 +148,7 @@ private:
 	float AO_Pitch;
 	FRotator StartingAimRotation;
 	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UCameraComponent> CameraComponent;
+
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> CameraBoom;

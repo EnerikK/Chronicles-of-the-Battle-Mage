@@ -18,6 +18,15 @@ class BATTLEMAGE_API UBMGameplayAbility : public UGameplayAbility
 	GENERATED_BODY()
 
 public:
+	
+	UPROPERTY(EditDefaultsOnly,Category="Inputs")
+	FGameplayTag StartupInputTag;
+
+	UFUNCTION(BlueprintCallable)
+	void StoreOwnerVariables();
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<ACharacter> OwnerCharacter;
 
 	UPROPERTY(BlueprintReadWrite)
 	ABMCharacter* ControlledPlayer;
@@ -25,24 +34,10 @@ public:
 	UPROPERTY()
 	UCombatComponent* Combat;
 
-	UFUNCTION(BlueprintPure)
-	bool IsStateEqualToAny(const TArray<ECombatState>& StatesToCheck);
-	UFUNCTION(BlueprintCallable)
-	void SetState(ECombatState NewState);
-	UFUNCTION(BlueprintPure)
-	void GetState(ECombatState& ThisState);
-	UPROPERTY(BlueprintReadOnly)
-	ECombatState CurrentState;
+protected:
 
-	UFUNCTION(BlueprintCallable)
-	void StoreOwnerVariables();
-
-	UPROPERTY(BlueprintReadWrite)
-	TObjectPtr<ACharacter> OwnerCharacter;
+	float GetManaCost(float InLevel = 1.f)const;
+	float GetCooldown(float InLevel = 1.f)const;
 	
-
-	
-	UPROPERTY(EditDefaultsOnly,Category="Inputs")
-	FGameplayTag StartupInputTag;
 	
 };

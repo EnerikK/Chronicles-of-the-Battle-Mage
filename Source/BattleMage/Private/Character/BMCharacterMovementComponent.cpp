@@ -220,7 +220,7 @@ void UBmCharacterMovementComponent::UpdateCharacterStateBeforeMovement(float Del
 	}
 		
 	/*try Mantle*/
-	if(PlayerCharacter->bPressedBattleMageJump)
+	/*if(PlayerCharacter->bPressedBattleMageJump)
 	{
 		if(TryMantle())
 		{
@@ -232,7 +232,7 @@ void UBmCharacterMovementComponent::UpdateCharacterStateBeforeMovement(float Del
 			CharacterOwner->bPressedJump = true;
 			CharacterOwner->CheckJumpInput(DeltaSeconds);
 		}
-	}
+	}*/
 }
 
 void UBmCharacterMovementComponent::UpdateCharacterStateAfterMovement(float DeltaSeconds)
