@@ -11,6 +11,7 @@
 #include "Types/TurnInPlace.h"
 #include "BMCharacter.generated.h"
 
+class UBMMotionWarping;
 enum class ECombatState : uint8;
 class ABMPlayerState;
 class UBmCharacterMovementComponent;
@@ -53,6 +54,7 @@ public:
 	void SetStateInCode(ECombatState NewState);
 	UFUNCTION(BlueprintCallable,BlueprintPure)
 	bool IsStateEqualToAnyInCode(TArray<ECombatState> StatesToCheck);
+	
 	
 	/*Attack*/
 	UPROPERTY(BlueprintReadWrite)
@@ -128,6 +130,9 @@ private:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,meta = (AllowPrivateAccess = true))
 	UCombatComponent* Combat;
 
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,meta = (AllowPrivateAccess = true))
+	UBMMotionWarping* BMMotionWarping;
+	
 	UPROPERTY(BlueprintReadOnly,EditDefaultsOnly,Category=Movement,meta=(AllowPrivateAccess = true))
 	UBmCharacterMovementComponent* BMCharacterMovementComponent;
 	

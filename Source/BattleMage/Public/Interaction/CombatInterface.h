@@ -62,6 +62,11 @@ public:
 	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable)
 	void SetInChargeLoop(bool bInLoop);
 
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
+	USkeletalMeshComponent* GetWeapon();
+
+	
+
 
 	
 	

@@ -9,14 +9,6 @@
 
 
 
-void UBMGameplayAbility::StoreOwnerVariables()
-{
-	if(CurrentActorInfo)
-	{
-		OwnerCharacter = Cast<ACharacter>(CurrentActorInfo->AvatarActor);
-	}
-}
-
 float UBMGameplayAbility::GetManaCost(float InLevel) const
 {
 	float ManaCost = 0.f;

@@ -2,7 +2,6 @@
 
 
 #include "Character/BMCharacterBase.h"
-
 #include "AbilitySystemComponent.h"
 #include "BMGameplayTags.h"
 #include "AbilitySystem/BMAbilitySystemComponent.h"
@@ -16,8 +15,6 @@ ABMCharacterBase::ABMCharacterBase(const FObjectInitializer& ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	const FBattleMageGameplayTags& GameplayTags = FBattleMageGameplayTags::Get();
-	
-	
 }
 void ABMCharacterBase::Tick(float DeltaTime)
 {

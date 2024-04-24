@@ -17,18 +17,39 @@ class BATTLEMAGE_API UBMShadowStrike : public UBMDamageGameplayAbility
 
 public:
 
-	UFUNCTION()
-	void TimelineProgress(float value);
 
+	UFUNCTION(BlueprintCallable)
+	void StoreMouseDataInfo(const FHitResult& HitResult);
+
+	UFUNCTION(BlueprintCallable)
+	void StoreOwnerVariables();
+
+	UFUNCTION(BlueprintCallable)
+	void TraceFirstTarget();
+
+	UPROPERTY(EditDefaultsOnly,Category="Inputs")
+	FGameplayTag SecondaryInputTag;
+
+	
 protected:
+	
+	UPROPERTY(BlueprintReadWrite , Category = "Strike")
+	FVector MouseHitLocation;
 
-	UPROPERTY(EditAnywhere,Category="Timeline")
-	UCurveFloat* CurveFloat;
-	UPROPERTY()
-	FVector StartLoc;
-	UPROPERTY()
-	FVector EndLoc;
-	UPROPERTY(EditAnywhere,Category="Timeline")
-	float ZOffset;
+	UPROPERTY(BlueprintReadWrite , Category = "Strike")
+	TObjectPtr<AActor> MouseHitActor;
+
+	UPROPERTY(BlueprintReadWrite , Category = "Strike")
+	TObjectPtr<APlayerController> OwnerPlayerController;
+
+	UPROPERTY(BlueprintReadWrite , Category = "Strike")
+	TObjectPtr<ABMCharacter> OwnerPlayerCharacter;
+
+	/*UPROPERTY(BlueprintReadWrite , Category = "Strike")
+	TObjectPtr<ACharacter> OwnerPlayerCharacter;*/
+
+	
+
+	
 	
 };

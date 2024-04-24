@@ -8,7 +8,7 @@ public class BattleMage : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject","EnhancedInput", "Engine", "InputCore" , "Niagara","GameplayAbilities","UMG"});
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject","EnhancedInput", "Engine", "InputCore" , "Niagara","GameplayAbilities","UMG", "MotionWarping" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {"GameplayTags","GameplayTasks","Niagara","AIModule"});
 

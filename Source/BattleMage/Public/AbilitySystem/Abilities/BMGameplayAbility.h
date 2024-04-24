@@ -22,17 +22,6 @@ public:
 	UPROPERTY(EditDefaultsOnly,Category="Inputs")
 	FGameplayTag StartupInputTag;
 
-	UFUNCTION(BlueprintCallable)
-	void StoreOwnerVariables();
-
-	UPROPERTY(BlueprintReadWrite)
-	TObjectPtr<ACharacter> OwnerCharacter;
-
-	UPROPERTY(BlueprintReadWrite)
-	ABMCharacter* ControlledPlayer;
-
-	UPROPERTY()
-	UCombatComponent* Combat;
 
 protected:
 

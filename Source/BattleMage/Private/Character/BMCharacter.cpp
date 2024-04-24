@@ -11,6 +11,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Interaction/BMMotionWarping.h"
 #include "Interaction/CombatComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -45,6 +46,10 @@ ABMCharacter::ABMCharacter(const FObjectInitializer& ObjectInitializer)
 
 	Combat = CreateDefaultSubobject<UCombatComponent>("Combat");
 	Combat->SetIsReplicated(true);
+
+	BMMotionWarping = CreateDefaultSubobject<UBMMotionWarping>("BMMotionWarping");
+	BMMotionWarping->SetIsReplicated(true);
+	
 
 	TurningInPlace = ETurnInPlace::ETurnIP_NotTurning;
 }
@@ -101,6 +106,10 @@ void ABMCharacter::PostInitializeComponents()
 	if(Combat)
 	{
 		Combat->Character = this;
+	}
+	if(BMMotionWarping)
+	{
+		BMMotionWarping->Character = this;
 	}
 	
 }

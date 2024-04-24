@@ -12,7 +12,7 @@ struct FActiveGameplayEffectHandle;
 class UAbilitySystemComponent;
 class UGameplayEffect;
 
-UENUM(BlueprintType)
+UENUM()
 enum class EEffectApplicationPolicy
 {
 	ApplyOnOverlap,
