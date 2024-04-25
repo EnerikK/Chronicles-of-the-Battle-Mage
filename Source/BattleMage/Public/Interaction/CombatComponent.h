@@ -35,6 +35,7 @@ public:
 	void EquipWeapon(AWeapon* WeaponToEquip);
 	bool bShouldSwapWeapon();
 	void SwapWeapon();
+	
 	UFUNCTION(BlueprintCallable)
 	void FinishSwap();
 	UFUNCTION(BlueprintCallable)

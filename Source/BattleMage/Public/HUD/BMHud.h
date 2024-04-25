@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "BMHud.generated.h"
 
+class UAttributeStatusWidget;
 struct FWidgetControllerParams;
 class UOverlayWidgetController;
 class UAbilitySystemComponent;
@@ -44,16 +45,13 @@ public:
 	TObjectPtr<UBMUserWidget> OverlayWidget;
 	
 	void InitOverlay(APlayerController* PC , APlayerState* PS , UAbilitySystemComponent* ASC , UAttributeSet* AS);
-
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
-
-
-
+	UAttributeStatusWidget* GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams);
+	
 	virtual void DrawHUD() override;
+
 	
 	FORCEINLINE void SetHudPackage(const FHUDPackage& Package) {HudPackage = Package;}
-
-
 
 protected:
 
@@ -78,6 +76,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UOverlayWidgetController> OverlayWidgetControllerClass;
+
+	UPROPERTY()
+	TObjectPtr<UAttributeStatusWidget> AttributeStatusWidget;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UAttributeStatusWidget> AttributeStatusWidgetClass;
 	
 	
 };

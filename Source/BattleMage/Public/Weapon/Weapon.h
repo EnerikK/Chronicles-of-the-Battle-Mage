@@ -49,6 +49,8 @@ public:
 
 	FORCEINLINE USphereComponent* GetPickUpSphere() const {return PickUpSphere;}
 	FORCEINLINE EWeaponType GetWeaponType() const {return WeaponType;}
+	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh()const {return WeaponMesh;}
+
 	
 	UPROPERTY(EditDefaultsOnly)
 	TArray<UAnimMontage* > AttackMontages;

@@ -3,7 +3,11 @@
 
 #include "HUD/BMHud.h"
 #include "Blueprint/UserWidget.h"
+#include "Engine/Engine.h"
+#include "Engine/GameViewportClient.h"
+#include "Engine/Texture2D.h"
 #include "HUD/BMWidgetController.h"
+#include "HUD/Widget/AttributeStatusWidget.h"
 #include "HUD/Widget/BMUserWidget.h"
 #include "HUD/Widget/OverlayWidgetController.h"
 
@@ -41,6 +45,17 @@ UOverlayWidgetController* ABMHud::GetOverlayWidgetController(const FWidgetContro
 		OverlayWidgetController->BindCallBacksToDependencies();
 	}
 	return OverlayWidgetController;
+}
+
+UAttributeStatusWidget* ABMHud::GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (AttributeStatusWidget == nullptr)
+	{
+		AttributeStatusWidget = NewObject<UAttributeStatusWidget>(this, AttributeStatusWidgetClass);
+		AttributeStatusWidget->SetWidgetControllerParams(WCParams);
+		AttributeStatusWidget->BindCallBacksToDependencies();
+	}
+	return AttributeStatusWidget;
 }
 
 void ABMHud::DrawHUD()

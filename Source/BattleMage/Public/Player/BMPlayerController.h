@@ -27,11 +27,15 @@ class BATTLEMAGE_API ABMPlayerController : public APlayerController
 public:
 
 	ABMPlayerController();
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void OnPossess(APawn* InPawn) override;
-	virtual void PostInitializeComponents() override;
 
 
+	UPROPERTY(Replicated)
+	bool bDisableGameplay = false;
+	FORCEINLINE bool GetDisableGameplay() const {return bDisableGameplay;}
+	
 protected:
 
 	virtual void BeginPlay() override;
@@ -39,7 +43,7 @@ protected:
 
 private:
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere)
 	UCombatComponent* Combat;
 
 	UBMAbilitySystemComponent* GetASC();
@@ -89,10 +93,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> HeavyAttackAction;
-
-	UPROPERTY(EditAnywhere, Category="Input")
-	TObjectPtr<UInputAction> WeaponSwapAction;
-	
 	
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -105,7 +105,6 @@ private:
 	void SlideReleased(const FInputActionValue& Value);
 	void Attack(const FInputActionValue& Value);
 	void HeavyAttack(const FInputActionValue& Value);
-	void Swap(const FInputActionValue& Value);
 
 	
 };

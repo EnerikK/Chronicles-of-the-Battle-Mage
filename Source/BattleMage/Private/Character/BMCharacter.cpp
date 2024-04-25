@@ -3,17 +3,14 @@
 
 #include "Character/BMCharacter.h"
 #include "AbilitySystemComponent.h"
-#include "AnalyticsEventAttribute.h"
 #include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Character/BMCharacterMovementComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Interaction/BMMotionWarping.h"
 #include "Interaction/CombatComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/BMPlayerController.h"
@@ -24,6 +21,8 @@ ABMCharacter::ABMCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UBmCharacterMovementComponent>(
 		  ACharacter::CharacterMovementComponentName))
 {
+	PrimaryActorTick.bCanEverTick = true;
+	
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoom");
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->bDoCollisionTest = false;
@@ -59,6 +58,13 @@ void ABMCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	RotateInPlace(DeltaSeconds);
 }
+
+FVector ABMCharacter::GetHitTarget() const
+{
+	if(Combat == nullptr) return FVector();
+	return Combat->HitTarget;
+}
+
 void ABMCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -91,7 +97,11 @@ void ABMCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(ABMCharacter,OverlappingWeapon,COND_OwnerOnly);
+}
 
+void ABMCharacter::OnRep_ReplicatedMovement()
+{
+	Super::OnRep_ReplicatedMovement();
 }
 
 void ABMCharacter::OnRep_PlayerState()
@@ -166,12 +176,18 @@ bool ABMCharacter::IsWeaponEquipped()
 
 void ABMCharacter::PlaySwapMontage()
 {
-	if(Combat == nullptr || Combat->EquippedWeapon == nullptr) return;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance && WeaponSwapMontage)
+	
+	if(AnimInstance && GetWeaponSwapMontage())
 	{
-		AnimInstance->Montage_Play(WeaponSwapMontage);
+		AnimInstance->Montage_Play(GetWeaponSwapMontage());
 	}
+}
+
+ECombatState ABMCharacter::GetCombatState() const
+{
+	if(Combat == nullptr) return ECombatState::ECState_MAX;
+	return Combat->CombatState;
 }
 
 void ABMCharacter::SetStateInCode(ECombatState NewState)
@@ -191,9 +207,10 @@ bool ABMCharacter::IsStateEqualToAnyInCode(TArray<ECombatState> StatesToCheck)
 	return false;
 }
 
-bool ABMCharacter::PerformLightAttackInCode(int32 CurrentAttackIndex)
+void ABMCharacter::PerformLightAttackInCode(int32 CurrentAttackIndex)
 {
 	AttackIndexInCode = CurrentAttackIndex;
+	
 	if(IsWeaponEquipped() && Combat->CombatState == ECombatState::ECState_Unoccupied)
 	{
 		UAnimMontage* LightAttackMontage = Combat->EquippedWeapon->AttackMontages[AttackIndexInCode];
@@ -210,14 +227,10 @@ bool ABMCharacter::PerformLightAttackInCode(int32 CurrentAttackIndex)
 			if(AttackIndexInCode >=  Combat->EquippedWeapon->AttackMontages.Num())
 			{
 				AttackIndexInCode = 0;
-				return true;
 			}
-			return true;
 		}
 	}
-	return false;
 }
-
 bool ABMCharacter::PerformHeavyAttackInCode(int32 CurrentAttackIndex)
 {
 	HeavyAttackIndexInCode = CurrentAttackIndex;
@@ -250,7 +263,7 @@ void ABMCharacter::AttackEvent()
 
 void ABMCharacter::HeavyAttackEvent()
 {
-	if(Combat->CombatState != ECombatState::ECState_Attack)
+	if(Combat->CombatState != ECombatState::ECState_HeavyAttack)
 	{
 		PerformHeavyAttackInCode(HeavyAttackIndexInCode);
 	}
@@ -262,8 +275,8 @@ void ABMCharacter::SaveLightAttack()
 		bSaveLightAttack = false;
 		if(Combat->CombatState == ECombatState::ECState_Attack)
 		{
-			SetStateInCode(ECombatState::ECState_Unoccupied);
 			AttackEvent();
+			SetStateInCode(ECombatState::ECState_Unoccupied);
 		}
 		AttackEvent();
 	}
@@ -274,7 +287,7 @@ void ABMCharacter::SaveHeavyAttack()
 	if(bSaveHeavyAttack)
 	{
 		bSaveHeavyAttack = false;
-		if(Combat->CombatState == ECombatState::ECState_Attack)
+		if(Combat->CombatState == ECombatState::ECState_HeavyAttack)
 		{
 			HeavyAttackEvent();
 			SetStateInCode(ECombatState::ECState_Unoccupied);
@@ -290,7 +303,7 @@ void ABMCharacter::ServerEquipButtonPressed_Implementation()
 		{
 			Combat->EquipWeapon(OverlappingWeapon);
 		}
-		else if (Combat->bShouldSwapWeapon() && Combat->CombatState != ECombatState::ECState_Attack)
+		else if (Combat->bShouldSwapWeapon())
 		{
 			Combat->SwapWeapon();
 		}

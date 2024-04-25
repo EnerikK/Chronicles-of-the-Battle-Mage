@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "Engine/DataTable.h"
 #include "HUD/BMWidgetController.h"
 #include "HUD/Widget/BMUserWidget.h"
 #include "OverlayWidgetController.generated.h"

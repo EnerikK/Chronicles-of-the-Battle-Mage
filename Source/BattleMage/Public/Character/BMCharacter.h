@@ -12,7 +12,6 @@
 #include "BMCharacter.generated.h"
 
 class UBMMotionWarping;
-enum class ECombatState : uint8;
 class ABMPlayerState;
 class UBmCharacterMovementComponent;
 class AWeapon;
@@ -35,6 +34,7 @@ public:
 	ABMCharacter(const FObjectInitializer& ObjectInitializer);
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void OnRep_ReplicatedMovement() override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 	virtual void PostInitializeComponents() override;
@@ -44,9 +44,11 @@ public:
 	void EquipButtonPressed();
 	AWeapon* GetEquippedWeapon();
 	bool IsWeaponEquipped();
-	UPROPERTY(BlueprintReadWrite)
-	bool bFinishedSwapping = true;
+	
+	bool bFinishedSwapping = false;
 	void PlaySwapMontage();
+	
+	ECombatState GetCombatState() const;
 
 	/*States*/
 	ECombatState CurrentState;
@@ -66,7 +68,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool bSaveHeavyAttack = false;
 	UFUNCTION(BlueprintCallable)
-	bool PerformLightAttackInCode(int32 CurrentAttackIndex);
+	void PerformLightAttackInCode(int32 CurrentAttackIndex);
 	UFUNCTION(BlueprintCallable)
 	bool PerformHeavyAttackInCode(int32 CurrentAttackIndex);
 	UFUNCTION(BlueprintCallable)
@@ -77,9 +79,6 @@ public:
 	void SaveLightAttack();
 	UFUNCTION(BlueprintCallable)
 	void SaveHeavyAttack();
-
-	/*Charge Attacks*/
-	
 	
 	/*Character*/
 	void RotateInPlace(float DeltaTime);
@@ -101,6 +100,7 @@ public:
 	FORCEINLINE UAnimMontage* GetSlideMontage() const {return SlideMontage;}
 	FORCEINLINE UAnimMontage* GetSwordPickUpMontage() const {return SwordPickUpMontage;}
 	FORCEINLINE UAnimMontage* GetWeaponSwapMontage() const {return WeaponSwapMontage;}
+	FVector GetHitTarget() const;
 
 
 protected:
@@ -153,8 +153,6 @@ private:
 	float AO_Pitch;
 	FRotator StartingAimRotation;
 	
-
-
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> CameraBoom;
 

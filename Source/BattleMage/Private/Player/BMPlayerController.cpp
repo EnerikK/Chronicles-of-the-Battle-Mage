@@ -15,13 +15,18 @@
 #include "Input/BMInputComponent.h"
 #include "Interaction/CombatComponent.h"
 #include "Interaction/EnemyInterface.h"
+#include "Net/UnrealNetwork.h"
 
 
 ABMPlayerController::ABMPlayerController()
 {
 	bReplicates = true;
-	Combat = CreateDefaultSubobject<UCombatComponent>("CombatComponent");
-	Combat->SetIsReplicated(true);
+}
+
+void ABMPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ABMPlayerController,bDisableGameplay);
 }
 
 void ABMPlayerController::Tick(float DeltaSeconds)
@@ -33,15 +38,6 @@ void ABMPlayerController::Tick(float DeltaSeconds)
 void ABMPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-}
-
-void ABMPlayerController::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-	if(Combat)
-	{
-		Combat->Controller = this;
-	}
 }
 
 void ABMPlayerController::BeginPlay()
@@ -165,6 +161,7 @@ void ABMPlayerController::SetupInputComponent()
 }
 void ABMPlayerController::Move(const FInputActionValue& Value)
 {
+	if(bDisableGameplay) return;
 	APawn* ControlledPawn = GetPawn<APawn>();
 
 	if(ControlledPawn != nullptr)
@@ -214,6 +211,7 @@ void ABMPlayerController::Jump(const FInputActionValue& Value)
 
 void ABMPlayerController::Equip(const FInputActionValue& Value)
 {
+	if(bDisableGameplay) return;
 	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
 	{
 		ControlledCharacter->EquipButtonPressed();
@@ -273,12 +271,5 @@ void ABMPlayerController::HeavyAttack(const FInputActionValue& Value)
 	}
 }
 
-void ABMPlayerController::Swap(const FInputActionValue& Value)
-{
-	if(ABMCharacter* ControlledCharacter = Cast<ABMCharacter>(GetCharacter()))
-	{
-		ControlledCharacter->PlaySwapMontage();
-	}
-}
 
 

@@ -2,7 +2,11 @@
 
 
 #include "AbilitySystem/BMAbilitySystemComponent.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/Abilities/BMGameplayAbility.h"
+#include "Engine/Engine.h"
+#include "Interaction/PlayerInterface.h"
 
 void UBMAbilitySystemComponent::AbilityActorInfoSet()
 {
@@ -68,6 +72,31 @@ void UBMAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Input
 
 			}
 		}
+	}
+}
+
+void UBMAbilitySystemComponent::UpgradeAttribute(const FGameplayTag& AttributeTag)
+{
+	if(GetAvatarActor()->Implements<UPlayerInterface>())
+	{
+		if(IPlayerInterface::Execute_GetAttributePoints(GetAvatarActor()) >  0 )
+		{
+			ServerUpgradeAttribute(AttributeTag);
+		}
+	}
+}
+
+void UBMAbilitySystemComponent::ServerUpgradeAttribute_Implementation(const FGameplayTag& AttributeTag)
+{
+	FGameplayEventData Payload;
+	Payload.EventTag = AttributeTag;
+	Payload.EventMagnitude = 1.f;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActor(),AttributeTag,Payload);
+
+	if(GetAvatarActor()->Implements<UPlayerInterface>())
+	{
+		IPlayerInterface::Execute_AddToAttributePoints(GetAvatarActor(),-1);
 	}
 }
 

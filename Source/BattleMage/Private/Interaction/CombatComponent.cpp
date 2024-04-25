@@ -46,8 +46,10 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
 	DOREPLIFETIME(UCombatComponent,EquippedWeapon);
 	DOREPLIFETIME(UCombatComponent,SecondaryWeapon);
+	DOREPLIFETIME(UCombatComponent,CombatState);
 
 }
 void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
@@ -92,6 +94,8 @@ void UCombatComponent::FinishSwap()
 
 void UCombatComponent::FinishSwapWeapon()
 {
+	if (Character == nullptr || !Character->HasAuthority()) return;
+	
 	AWeapon* CurrentWeapon = EquippedWeapon;
 	EquippedWeapon = SecondaryWeapon;
 	SecondaryWeapon = CurrentWeapon;
@@ -273,11 +277,11 @@ void UCombatComponent::OnRep_CombatState()
 		if(Character && !Character->IsLocallyControlled())
 		break;
 	case ECombatState::ECState_Unoccupied:
-		if(Character)
+		/*if(Character)
 		{
 			Character->AttackIndexInCode = 0;
 			UE_LOG(LogTemp,Warning,TEXT("Unoccupiead"));
-		}
+		}*/
 			break;
 	case ECombatState::ECState_ThrowGrenade:
 		if(Character && !Character->IsLocallyControlled())
