@@ -5,7 +5,6 @@
 #include "Character/BMCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Weapon/Weapon.h"
 
 void UBMAnimInstance::NativeInitializeAnimation()
 {

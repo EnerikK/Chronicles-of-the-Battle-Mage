@@ -2,46 +2,43 @@
 
 
 #include "HUD/Widget/AttributeStatusWidget.h"
-
 #include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "AbilitySystem/BMAttributeSet.h"
 #include "AbilitySystem/Data/AttributeInfo.h"
 #include "Player/BMPlayerState.h"
 
-struct FOnAttributeChangeData;
 
 void UAttributeStatusWidget::BindCallBacksToDependencies()
 {
-	check(AttributeInfo);
-	for (auto Pair : GetBattleMageAS()->TagsToAttributes)
+	/*check(AttributeInfo);
+	for (auto& Pair : GetBattleMageAS()->TagsToAttributes)
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
-	[this,Pair](const FOnAttributeChangeData& Data)
+		[this, Pair](const FOnAttributeChangeData& Data)
 		{
-			BroadCastAttributeInfo(Pair.Key,Pair.Value());
+			BroadCastAttributeInfo(Pair.Key, Pair.Value());
 		}
-		);
+	);
 	}
 	
 	GetBattleMagePS()->OnAttributePointsChangedDelegate.AddLambda(
-	[this](int32 Points)
-	{
-		AttributePointsChangedDelegate.Broadcast(Points);
-	});
+		[this](int32 Points)
+		{
+			AttributePointsChangedDelegate.Broadcast(Points);
+		}
+	);*/
+	
 }
 
 void UAttributeStatusWidget::BroadcastInitialValues()
 {
 	UBMAttributeSet* AS = CastChecked<UBMAttributeSet>(AttributesSet);
-
 	check(AttributeInfo);
-	for(auto& Pair: AS->TagsToAttributes)
+	for (auto& Pair : AS->TagsToAttributes)
 	{
-		BroadCastAttributeInfo(Pair.Key,Pair.Value());
+		BroadCastAttributeInfo(Pair.Key, Pair.Value());
 	}
-
 	
-	AttributePointsChangedDelegate.Broadcast(GetBattleMagePS()->GetAttributePoints());
 }
 
 void UAttributeStatusWidget::UpgradeAttribute(const FGameplayTag& AttributeTag)

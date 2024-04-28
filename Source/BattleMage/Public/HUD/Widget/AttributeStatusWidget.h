@@ -7,9 +7,12 @@
 #include "AttributeStatusWidget.generated.h"
 
 struct FGameplayAttribute;
-class UAttributeInfo;
 struct FGameplayTag;
+class UAttributeInfo;
 struct FBattleMageAttributeInfo;
+
+
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAttributeInfoSignature, const FBattleMageAttributeInfo& , Info);
 
 /**
@@ -42,8 +45,5 @@ protected:
 private:
 
 	void BroadCastAttributeInfo(const FGameplayTag& AttributeTag,const FGameplayAttribute& Attribute)const;
-	
-
-	
 	
 };

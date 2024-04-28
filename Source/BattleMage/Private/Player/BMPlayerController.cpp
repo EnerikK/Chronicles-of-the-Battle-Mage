@@ -34,12 +34,6 @@ void ABMPlayerController::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	CursorTrace();
 }
-
-void ABMPlayerController::OnPossess(APawn* InPawn)
-{
-	Super::OnPossess(InPawn);
-}
-
 void ABMPlayerController::BeginPlay()
 {
 	Super::BeginPlay();

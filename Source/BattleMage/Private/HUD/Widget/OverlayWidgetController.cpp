@@ -2,20 +2,18 @@
 
 
 #include "HUD/Widget/OverlayWidgetController.h"
-
 #include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "AbilitySystem/BMAttributeSet.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
-	const UBMAttributeSet* BattleMageAttributeSet = CastChecked<UBMAttributeSet>(AttributesSet);
 	
-	OnHealthChanged.Broadcast(BattleMageAttributeSet->GetHealth());
-	OnMaxHealthChanged.Broadcast(BattleMageAttributeSet->GetMaxHealth());
-	OnManaChanged.Broadcast(BattleMageAttributeSet->GetMana());
-	OnMaxManaChanged.Broadcast(BattleMageAttributeSet->GetMaxMana());
-	OnStaminaChanged.Broadcast(BattleMageAttributeSet->GetStamina());
-	OnMaxStaminaChanged.Broadcast(BattleMageAttributeSet->GetMaxStamina());
+	/*OnHealthChanged.Broadcast(GetBattleMageAS()->GetHealth());
+	OnMaxHealthChanged.Broadcast(GetBattleMageAS()->GetMaxHealth());
+	OnManaChanged.Broadcast(GetBattleMageAS()->GetMana());
+	OnMaxManaChanged.Broadcast(GetBattleMageAS()->GetMaxMana());
+	OnStaminaChanged.Broadcast(GetBattleMageAS()->GetStamina());
+	OnMaxStaminaChanged.Broadcast(GetBattleMageAS()->GetMaxStamina());*/
 	
 }
 
@@ -67,6 +65,7 @@ void UOverlayWidgetController::BindCallBacksToDependencies()
 			OnMaxStaminaChanged.Broadcast(Data.NewValue);
 
 		});
+	
 	Cast<UBMAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
 		[this](const FGameplayTagContainer& AssetTags)
 		{
@@ -81,4 +80,5 @@ void UOverlayWidgetController::BindCallBacksToDependencies()
 			}
 		}
 	);
+	
 }

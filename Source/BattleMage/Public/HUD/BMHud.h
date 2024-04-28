@@ -13,24 +13,6 @@ class UAbilitySystemComponent;
 class UAttributeSet;
 class UBMUserWidget;
 
-USTRUCT(BlueprintType)
-struct FHUDPackage
-{
-	GENERATED_BODY()
-	
-public:
-	
-	UTexture2D* CrosshairCenter;
-	UTexture2D* CrosshairLeft;
-	UTexture2D* CrosshairRight;
-	UTexture2D* CrosshairTop;
-	UTexture2D* CrosshairBottom;
-	float CrosshairSpread;
-	FLinearColor CrosshairColor;
-
-};
-
-
 /**
  * 
  */
@@ -41,32 +23,23 @@ class BATTLEMAGE_API ABMHud : public AHUD
 
 public:
 	
-	UPROPERTY()
-	TObjectPtr<UBMUserWidget> OverlayWidget;
 	
 	void InitOverlay(APlayerController* PC , APlayerState* PS , UAbilitySystemComponent* ASC , UAttributeSet* AS);
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
 	UAttributeStatusWidget* GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams);
-	
-	virtual void DrawHUD() override;
 
-	
-	FORCEINLINE void SetHudPackage(const FHUDPackage& Package) {HudPackage = Package;}
 
 protected:
 
-	virtual void BeginPlay() override;
 
 private:
+	
+	UPROPERTY()
+	TObjectPtr<UBMUserWidget> OverlayWidget;
 
 	UPROPERTY()
 	APlayerController* OwningPlayer;
 	
-	FHUDPackage HudPackage;
-	void DrawCrosshair(UTexture2D* Texture , FVector2d ViewportCenter,FVector2d Spread,FLinearColor CrosshairColor);
-
-	UPROPERTY(EditAnywhere)
-	float MaxCrosshairSpread = 10.f;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> OverlayWidgetClass;

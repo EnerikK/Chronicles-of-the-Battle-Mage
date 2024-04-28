@@ -32,11 +32,32 @@ bool UBlueprintSystemLibrary::MakeWidgetControllerParams(const UObject* WorldCon
 
 UAttributeStatusWidget* UBlueprintSystemLibrary::GetAttributeMenuWidgetController(const UObject* WorldContextObject)
 {
-	FWidgetControllerParams WCParams;
-	ABMHud* BMHud = nullptr;
-	if (MakeWidgetControllerParams(WorldContextObject, WCParams, BMHud))
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
 	{
-		return BMHud->GetAttributeMenuWidgetController(WCParams);
+		if (ABMHud* BMHUD = Cast<ABMHud>(PC->GetHUD()))
+		{
+			ABMPlayerState* PS = PC->GetPlayerState<ABMPlayerState>();
+			UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
+			UAttributeSet* AS = PS->GetAttributeSet();
+			const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
+			return BMHUD->GetAttributeMenuWidgetController(WidgetControllerParams);
+		}
+	}
+	return nullptr;
+}
+
+UOverlayWidgetController* UBlueprintSystemLibrary::GetOverlayWidgetController(const UObject* WorldContextObject)
+{
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
+	{
+		if (ABMHud* BMHUD = Cast<ABMHud>(PC->GetHUD()))
+		{
+			ABMPlayerState* PS = PC->GetPlayerState<ABMPlayerState>();
+			UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
+			UAttributeSet* AS = PS->GetAttributeSet();
+			const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
+			return BMHUD->GetOverlayWidgetController(WidgetControllerParams);
+		}
 	}
 	return nullptr;
 }

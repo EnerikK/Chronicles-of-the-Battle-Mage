@@ -50,11 +50,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-	void TraceUnderCrosshair(FHitResult& TraceHitResult);
-
-	void SetHudCrosshair(float DeltaTime);
-
+	
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
 	UFUNCTION()
@@ -89,7 +85,6 @@ private:
 	
 	FVector HitTarget;
 
-	FHUDPackage HUDPackage;
 
 	float CrosshairVelocity;
 

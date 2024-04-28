@@ -29,7 +29,6 @@ public:
 	ABMPlayerController();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Tick(float DeltaSeconds) override;
-	virtual void OnPossess(APawn* InPawn) override;
 
 
 	UPROPERTY(Replicated)

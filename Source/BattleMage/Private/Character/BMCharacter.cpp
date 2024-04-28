@@ -345,10 +345,11 @@ void ABMCharacter::InitAbilityActorInfo()
 
 	BattleMagePlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(BattleMagePlayerState,this);
 	Cast<UBMAbilitySystemComponent>(BattleMagePlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
-	AbilitySystemComponent = BattleMagePlayerState->GetAbilitySystemComponent();AttributeSet = BattleMagePlayerState->GetAttributeSet();
+	AbilitySystemComponent = BattleMagePlayerState->GetAbilitySystemComponent();
 	AttributeSet = BattleMagePlayerState->GetAttributeSet();
-
 	OnAscRegistered.Broadcast(AbilitySystemComponent);
+	AbilitySystemComponent = BattleMagePlayerState->GetAbilitySystemComponent();AttributeSet = BattleMagePlayerState->GetAttributeSet();
+	
 	if(ABMPlayerController* BattleMagePlayerController = Cast<ABMPlayerController>(GetController()))
 	{
 		if(ABMHud* BattleMageHud = Cast<ABMHud>(BattleMagePlayerController->GetHUD()))

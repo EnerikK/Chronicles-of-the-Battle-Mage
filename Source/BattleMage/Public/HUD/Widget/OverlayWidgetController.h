@@ -10,6 +10,7 @@
 #include "OverlayWidgetController.generated.h"
 
 
+struct FBattleMageAttributeInfo;
 
 USTRUCT(BlueprintType)
 struct FUIWidgetRow : public FTableRowBase
@@ -29,6 +30,10 @@ struct FUIWidgetRow : public FTableRowBase
 	UTexture2D* Image = nullptr;
 	
 };
+
+class UBMUserWidget;
+class UAbilityInfo;
+class UBMAbilitySystemComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow , Row);

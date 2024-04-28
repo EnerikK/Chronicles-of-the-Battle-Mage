@@ -32,15 +32,6 @@ void UCombatComponent::BeginPlay()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if(Character && Character->IsLocallyControlled())
-	{
-		FHitResult HitResult;
-		TraceUnderCrosshair(HitResult);
-		HitTarget = HitResult.ImpactPoint;
-		
-		SetHudCrosshair(DeltaTime);
-	}
 }
 
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -107,89 +98,6 @@ void UCombatComponent::FinishSwapWeapon()
 	AttachActorToBackPack(SecondaryWeapon);
 }
 
-void UCombatComponent::TraceUnderCrosshair(FHitResult& TraceHitResult)
-{
-	FVector2D ViewportSize;
-	if(GEngine && GEngine->GameViewport)
-	{
-		GEngine->GameViewport->GetViewportSize(ViewportSize);
-	}
-	FVector2D CrosshairLocation(ViewportSize.X/2.f,ViewportSize.Y/2.f);//Center of the viewport
-	FVector CrossHairWorldPosition;
-	FVector CrossHairWorldDirection;
-	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
-		UGameplayStatics::GetPlayerController(this,0),
-		CrosshairLocation,CrossHairWorldPosition,CrossHairWorldDirection
-		);
-	if(bScreenToWorld)
-	{
-		FVector Start = CrossHairWorldPosition;
-
-		if(Character)
-		{
-			float DistanceToCharacter = (Character->GetActorLocation() - Start).Size();
-			Start += CrossHairWorldDirection * (DistanceToCharacter + 100.f);
-			DrawDebugSphere(GetWorld(),Start,16.f,12,FColor::Red,false);
-		}
-		
-		FVector End = Start + CrossHairWorldDirection * TRACE;
-		GetWorld()->LineTraceSingleByChannel(
-			TraceHitResult,
-			Start,
-			End,
-			ECC_Visibility
-		);
-		if (!TraceHitResult.bBlockingHit) { TraceHitResult.ImpactPoint = End; }
-		if(TraceHitResult.GetActor() && TraceHitResult.GetActor()->Implements<UCombatInterface>())
-		{
-			HUDPackage.CrosshairColor = FLinearColor::Red;
-		}
-		else
-		{
-			HUDPackage.CrosshairColor = FLinearColor::White;
-		}
-	}
-}
-
-void UCombatComponent::SetHudCrosshair(float DeltaTime)
-{
-	if(Character == nullptr || Character->Controller == nullptr) return;
-
-	Controller = Controller == nullptr ? Cast<ABMPlayerController>(Character->Controller) : Controller; //Setting Controller variable and if
-	//its set we just set the controller to itself and we dont have to to do the  cast again 
-	
-	if(Controller)
-	{
-		Hud = Hud == nullptr ? Cast<ABMHud>(Controller->GetHUD()) : Hud; //same
-		if(Hud)
-		{
-			if(EquippedWeapon)
-			{
-				HUDPackage.CrosshairCenter = EquippedWeapon->CrosshairCenter;
-				HUDPackage.CrosshairLeft = EquippedWeapon->CrosshairLeft;
-				HUDPackage.CrosshairRight = EquippedWeapon->CrosshairRight;
-				HUDPackage.CrosshairBottom = EquippedWeapon->CrosshairBottom;
-				HUDPackage.CrosshairTop = EquippedWeapon->CrosshairTop;
-			}
-			else
-			{
-				HUDPackage.CrosshairCenter = nullptr;
-				HUDPackage.CrosshairLeft = nullptr;
-				HUDPackage.CrosshairRight = nullptr;
-				HUDPackage.CrosshairBottom = nullptr;
-				HUDPackage.CrosshairTop = nullptr;
-			}
-			//Calculate crosshair spread
-			//[0,600]->[0,1]
-			FVector2d WalkSpeed(0.f,Character->GetCharacterMovement()->MaxWalkSpeed);
-			FVector2d SpeedMultiplayer(0.f,1.f);
-			FVector Velocity = Character->GetVelocity();
-			Velocity.Z = 0.f;
-			CrosshairVelocity = FMath::GetMappedRangeValueClamped(WalkSpeed,SpeedMultiplayer,Velocity.Size());
-			
-		}
-	}
-}
 void UCombatComponent::OnRep_EquippedWeapon()
 {
 	if(EquippedWeapon && Character)
