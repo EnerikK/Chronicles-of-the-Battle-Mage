@@ -7,6 +7,7 @@
 #include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "Character/BMCharacterMovementComponent.h"
 #include "Player/BMPlayerState.h"
+#include "Weapon/Weapon.h"
 
 class UBmCharacterMovementComponent;
 
@@ -35,7 +36,11 @@ UAnimMontage* ABMCharacterBase::GetHitReactMontage_Implementation()
 FVector ABMCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
 	const FBattleMageGameplayTags& GameplayTags = FBattleMageGameplayTags::Get();
-	
+	if(IsValid(GetMesh()))
+	{
+		return GetMesh()->GetSocketLocation(WeaponTipSocketName);
+
+	}
 	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_LeftHand))
 	{
 		return GetMesh()->GetSocketLocation(LeftHandSocketName);
@@ -47,13 +52,6 @@ FVector ABMCharacterBase::GetCombatSocketLocation_Implementation(const FGameplay
 
 	}
 	return FVector();
-}
-
-int32 ABMCharacterBase::GetPlayerLevel_Implementation()
-{
-	const ABMPlayerState* BattleMagePlayerState = GetPlayerState<ABMPlayerState>();
-	check(BattleMagePlayerState);
-	return BattleMagePlayerState->GetPlayerLevel();
 }
 
 void ABMCharacterBase::BeginPlay()

@@ -158,6 +158,13 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_StaminaRegeneration, Category = "Secondary Attributes")
 	FGameplayAttributeData StaminaRegeneration;
 	ATTRIBUTE_ACCESSORS(UBMAttributeSet, StaminaRegeneration);
+
+	/*Meta Attributes*/
+	UPROPERTY(BlueprintReadOnly,Category="MetaAttributes")
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS(UBMAttributeSet,IncomingDamage);
+
+	
 	
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& oldHealth);

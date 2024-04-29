@@ -40,6 +40,7 @@ class BATTLEMAGE_API AWeapon : public AActor
 	
 public:	
 	AWeapon();
+	FVector GetSocketLocation(FName SocketName);
 	virtual void Tick(float DeltaTime) override;
 	void ShowPickUpWidget(bool bShowWidget);
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -108,7 +109,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere,Category="Weapon Properties")
 	USphereComponent* PickUpSphere;
-
+	
 	UPROPERTY(ReplicatedUsing = OnRep_WeaponState,VisibleAnywhere,Category="Weapon Properties")
 	EWeaponState WeaponState;
 	

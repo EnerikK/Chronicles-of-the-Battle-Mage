@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayTagContainer.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
 
@@ -51,7 +52,7 @@ public:
 	int32 GetPlayerLevel();
 
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
-	FVector GetCombatSocketLocation(const FGameplayTag& MontageTag);
+	FVector GetCombatSocketLocation(const FGameplayTag& MontageTag); //const FGameplayTag& MontageTag
 
 	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable)
 	void UpdateFacingTarget(const FVector& Target);
@@ -64,6 +65,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
 	USkeletalMeshComponent* GetWeapon();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	ECharacterClass GetCharacterClass();
 
 	
 

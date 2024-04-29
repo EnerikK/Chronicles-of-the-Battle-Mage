@@ -123,6 +123,15 @@ void ABMCharacter::PostInitializeComponents()
 	}
 	
 }
+
+int32 ABMCharacter::GetPlayerLevel_Implementation()
+{
+	const ABMPlayerState* BattleMagePlayerState = GetPlayerState<ABMPlayerState>();
+	check(BattleMagePlayerState);
+	return BattleMagePlayerState->GetPlayerLevel();
+	
+}
+
 /*Weapons*/
 void ABMCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 {

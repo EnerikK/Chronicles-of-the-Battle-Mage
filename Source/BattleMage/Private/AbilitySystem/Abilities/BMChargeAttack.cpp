@@ -13,3 +13,19 @@ void UBMChargeAttack::StoreOwnerVariables()
 	}
 }
 
+void UBMChargeAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
+
+void UBMChargeAttack::GenerateAttack(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag,
+                                     bool bOverridePitch, float PitchOverride, AActor* HomingTarget)
+{
+	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
+	if(!bIsServer)return;
+	
+	
+}
+

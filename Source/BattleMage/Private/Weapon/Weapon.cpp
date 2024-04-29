@@ -27,10 +27,17 @@ AWeapon::AWeapon()
 	PickUpSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
 	PickUpSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+
 	PickUpWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickUpWidget"));
 	PickUpWidget->SetupAttachment(RootComponent);
 
 }
+
+FVector AWeapon::GetSocketLocation(FName SocketName)
+{
+	return FVector();
+}
+
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();

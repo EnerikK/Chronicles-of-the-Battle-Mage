@@ -22,6 +22,13 @@ public:
 	ECombatState CombatState;
 
 protected:
+
+	virtual void ActivateAbility
+	(const FGameplayAbilitySpecHandle Handle,const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+
+	virtual void GenerateAttack(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag,
+	bool bOverridePitch, float PitchOverride, AActor* HomingTarget);
 	
 	UPROPERTY(BlueprintReadWrite , Category = "Strike")
 	TObjectPtr<APlayerController> OwnerPlayerController;
@@ -31,6 +38,7 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite , Category = "Strike")
 	TObjectPtr<ABMCharacter> PlayerCharacter;
+	
 	
 	
 };

@@ -39,6 +39,9 @@ public:
 	virtual void OnRep_PlayerState() override;
 	virtual void PostInitializeComponents() override;
 
+	/*Combat Interface*/
+	virtual int32 GetPlayerLevel_Implementation() override;
+
 	/*Weapons*/
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	void EquipButtonPressed();
@@ -49,6 +52,7 @@ public:
 	void PlaySwapMontage();
 	
 	ECombatState GetCombatState() const;
+	
 
 	/*States*/
 	ECombatState CurrentState;

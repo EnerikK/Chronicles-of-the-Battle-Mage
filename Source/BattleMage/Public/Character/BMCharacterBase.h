@@ -8,6 +8,7 @@
 #include "Interaction/CombatInterface.h"
 #include "BMCharacterBase.generated.h"
 
+class AWeapon;
 class UAbilitySystemComponent;
 class UAttributeSet;
 class UGameplayEffect;
@@ -29,18 +30,24 @@ public:
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	/*CombatInterface End*/
 
+	
+
 	FOnASCRegistered OnAscRegistered;
 
-	virtual int32 GetPlayerLevel_Implementation() override;
 
-	
+
 protected:
+
+	UPROPERTY()
+	AWeapon* PlayerWeapon;
 	
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo();
 	void AddCharacterAbilities();
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass,float Level)const;
-	void InitializeDefaultAttributes()const;
+	
+	virtual void InitializeDefaultAttributes() const;
+
 
 	UPROPERTY(BlueprintReadOnly,EditAnywhere,Category="Attributes")
 	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
