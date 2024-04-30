@@ -6,7 +6,9 @@
 #include "Abilities/Tasks/AbilityTask.h"
 #include "TargetDataUnderMouse.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMouseTargetDataSignature, const FGameplayAbilityTargetDataHandle& , DataHandle);
+class ABMCharacter;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMouseTargetDataSignature, const FGameplayAbilityTargetDataHandle&,
+                                            DataHandle);
 
 /**
  * 
@@ -24,8 +26,13 @@ class BATTLEMAGE_API UTargetDataUnderMouse : public UAbilityTask
 
 private:
 
+	FVector HitTarget;
+
+	UPROPERTY()
+	ABMCharacter* ControlledCharacter;
+
 	virtual void Activate() override;
-	void SendMouseCursorData();
+	void SendTraceUnderCursorData(FHitResult& TraceHitResult);
 
 	void OnTargetDataReplicatedCallBack(const FGameplayAbilityTargetDataHandle& DataHandle,FGameplayTag ActivationTag);
 	

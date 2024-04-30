@@ -21,6 +21,8 @@ class ABMHud;
 class USpringArmComponent;
 class UCameraComponent;
 class UTexture2D;
+
+#define TRACE 80000.f
 /**
  * 
  */
@@ -168,5 +170,7 @@ private:
 
 	UPROPERTY(EditAnywhere , Category= "Combat")
 	UAnimMontage* WeaponSwapMontage;
+
+	FVector HitTarget;
 	
 };

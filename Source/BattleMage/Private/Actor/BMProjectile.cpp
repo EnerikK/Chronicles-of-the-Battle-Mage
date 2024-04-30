@@ -32,6 +32,7 @@ ABMProjectile::ABMProjectile()
 void ABMProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+	SetLifeSpan(LifeSpan);
 	Sphere->OnComponentBeginOverlap.AddDynamic(this,&ABMProjectile::OnSphereOverlap);
 }
 
@@ -48,6 +49,12 @@ void ABMProjectile::Destroyed()
 {
 	/*if(!bHit && !HasAuthority()) OnHit();
 	Super::Destroyed();*/
+	if (!bHit && !HasAuthority())
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+	}
+	Super::Destroyed();
 }
 
 void ABMProjectile::OnSphereOverlap(UPrimitiveComponent* OverLappedComponent, AActor* OtherActor,
@@ -65,12 +72,22 @@ void ABMProjectile::OnSphereOverlap(UPrimitiveComponent* OverLappedComponent, AA
 		Destroy();
 	}
 	else bHit = true;*/
+	if (HasAuthority())
+	{
+		Destroy();
+	}
+	else
+	{
+		bHit = true;
+	}
 }
 
+/*
 bool ABMProjectile::IsValidOverlap(AActor* OtherActor)
 {
 	return true;
 }
+*/
 
 
 

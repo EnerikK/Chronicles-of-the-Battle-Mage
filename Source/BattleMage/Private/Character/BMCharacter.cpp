@@ -11,6 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Interaction/BMMotionWarping.h"
 #include "Interaction/CombatComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/BMPlayerController.h"
@@ -57,6 +58,7 @@ void ABMCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	RotateInPlace(DeltaSeconds);
+	
 }
 
 FVector ABMCharacter::GetHitTarget() const

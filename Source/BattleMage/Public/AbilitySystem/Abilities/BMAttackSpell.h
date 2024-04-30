@@ -27,7 +27,7 @@ protected:
 	AWeapon* Weapon;
 
 	UFUNCTION(BlueprintCallable,Category="Projectile")
-	void SpawnProjectile(const FVector& ProjectileTargetLocation,const FGameplayTag& SocketTag,bool bOverridePitch = false,float PitchOverride = 0);
+	void SpawnProjectile(const FVector& HitTarget,const FVector& ProjectileTargetLocation,const FGameplayTag& SocketTag,bool bOverridePitch = false,float PitchOverride = 0);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<ABMProjectile> ProjectileClass;

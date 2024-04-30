@@ -2,9 +2,9 @@
 
 
 #include "AbilitySystem/AbilityTasks/TargetDataUnderMouse.h"
-
 #include "AbilitySystemComponent.h"
-#include "BattleMage/BattleMage.h"
+#include "Character/BMCharacter.h"
+#include "Kismet/GameplayStatics.h"
 
 UTargetDataUnderMouse* UTargetDataUnderMouse::CreateTargetDataUnderMouse(UGameplayAbility* OwningAbility)
 {
@@ -17,7 +17,8 @@ void UTargetDataUnderMouse::Activate()
 	const bool bIsLocallyControlled = Ability->GetCurrentActorInfo()->IsLocallyControlled();
 	if(bIsLocallyControlled)
 	{
-		SendMouseCursorData();
+		FHitResult FHitResult;
+		SendTraceUnderCursorData(FHitResult);
 	}
 	else
 	{
@@ -32,17 +33,66 @@ void UTargetDataUnderMouse::Activate()
 		}
 	}
 }
-void UTargetDataUnderMouse::SendMouseCursorData()
+void UTargetDataUnderMouse::SendTraceUnderCursorData(FHitResult& TraceHitResult)
 {
 	FScopedPredictionWindow ScopedPrediction(AbilitySystemComponent.Get());
 	
 	APlayerController* PC = Ability->GetCurrentActorInfo()->PlayerController.Get();
-	FHitResult CursorHit;
-	PC->GetHitResultUnderCursor(ECC_Target,false,CursorHit);
+	//FHitResult CursorHit;
+
+
+	FVector2D ViewportSize;
+	if(GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+	FVector2D CrosshairLocation(ViewportSize.X/2.f,ViewportSize.Y/2.f);//Center of the viewport
+	FVector CrossHairWorldPosition;
+	FVector CrossHairWorldDirection;
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this,0),
+		CrosshairLocation,CrossHairWorldPosition,CrossHairWorldDirection
+		);
+	if(bScreenToWorld)
+	{
+		FVector Start = CrossHairWorldPosition;
+		FVector End = Start + CrossHairWorldDirection * TRACE;
+		
+		
+		/*float DistanceToCharacter = (Character->GetActorLocation() - Start).Size();
+		Start += CrossHairWorldDirection * (DistanceToCharacter + 100.f);
+		DrawDebugSphere(GetWorld(),Start,16.f,12,FColor::Red,true);*/
+		
+		GetWorld()->LineTraceSingleByChannel(
+			TraceHitResult,
+			Start,
+			End,
+			ECC_Visibility
+		);
+		if (!TraceHitResult.bBlockingHit)
+		{
+			TraceHitResult.ImpactPoint = End;
+			HitTarget = End;
+
+		}
+		else
+		{
+			HitTarget = TraceHitResult.ImpactPoint;
+			DrawDebugSphere(
+				GetWorld(),
+				TraceHitResult.ImpactPoint,
+				12.f,
+				12,
+				FColor::Red
+			);
+		}
+	}
+	
+	//PC->GetHitResultUnderCursor(ECC_Target,false,CursorHit);
 
 	FGameplayAbilityTargetDataHandle DataHandle;
 	FGameplayAbilityTargetData_SingleTargetHit* Data = new FGameplayAbilityTargetData_SingleTargetHit();
-	Data->HitResult = CursorHit;
+	Data->HitResult = TraceHitResult;
 	DataHandle.Add(Data);
 
 	FGameplayTag ApplicationTag;

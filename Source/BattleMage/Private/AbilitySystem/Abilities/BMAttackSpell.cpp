@@ -7,9 +7,8 @@
 #include "Character/BMCharacter.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "Weapon/Weapon.h"
 
-void UBMAttackSpell::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag,
+void UBMAttackSpell::SpawnProjectile(const FVector& HitTarget,const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag,
 	bool bOverridePitch, float PitchOverride)
 {
 	UKismetSystemLibrary::PrintString(this, FString("ActivateAbility (C++)"), true, true, FLinearColor::Yellow, 3);
@@ -20,11 +19,13 @@ void UBMAttackSpell::SpawnProjectile(const FVector& ProjectileTargetLocation, co
 	if (CombatInterface)
 	{
 		const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(),SocketTag);
+		FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+		//Rotation.Pitch = 0.f;
 
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(SocketLocation);
-		//TODO: Set the Projectile Rotation
-
+		SpawnTransform.SetRotation(Rotation.Quaternion());
+		
 		ABMProjectile* Projectile = GetWorld()->SpawnActorDeferred<ABMProjectile>(
 			ProjectileClass,
 			SpawnTransform,

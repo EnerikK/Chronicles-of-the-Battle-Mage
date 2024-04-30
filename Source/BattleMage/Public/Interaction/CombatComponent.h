@@ -8,7 +8,6 @@
 #include "Types/CombatState.h"
 #include "CombatComponent.generated.h"
 
-#define TRACE 80000.f
 
 
 class UBMGameplayAbility;
