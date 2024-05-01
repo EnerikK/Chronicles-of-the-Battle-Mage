@@ -14,7 +14,8 @@ struct FBattleMageGameplayTags
 	
 	static const FBattleMageGameplayTags& Get(){return GameplayTags;}
 	static void InitializeNativeGameplayTags();
-	
+
+	/*AttribueTags*/
 	FGameplayTag Attributes_Primary_Strength;
 	FGameplayTag Attributes_Primary_Intelligence;
 	FGameplayTag Attributes_Primary_Resilience;
@@ -27,30 +28,32 @@ struct FBattleMageGameplayTags
 	FGameplayTag Attributes_Secondary_CriticalHitResistance;
 	FGameplayTag Attributes_Secondary_HealthRegeneration;
 	FGameplayTag Attributes_Secondary_ManaRegeneration;
-	/*FGameplayTag Attributes_Secondary_StaminaRegeneration;*/
+	FGameplayTag Attributes_Secondary_StaminaRegeneration;
 	FGameplayTag Attributes_Secondary_MaxHealth;
 	FGameplayTag Attributes_Secondary_MaxMana;
-	/*FGameplayTag Attributes_Secondary_MaxStamina;*/
-
+	FGameplayTag Attributes_Secondary_MaxStamina;
 	
+	/*Input Tags*/
 	FGameplayTag InputTag_LMB;
 	FGameplayTag InputTag_RMB;
 	FGameplayTag InputTag_1;
 	FGameplayTag InputTag_2;
 	FGameplayTag InputTag_3;
 	FGameplayTag InputTag_4;
-
-
-	FGameplayTag CombatSocket_Weapon;
-	FGameplayTag CombatSocket_RightHand;
-	FGameplayTag CombatSocket_LeftHand;
-
+	
 	FGameplayTag Player_Block_CursorTrace;
 	FGameplayTag Player_Block_InputHeld;
 	FGameplayTag Player_Block_InputReleased;
 	FGameplayTag Player_Block_InputPressed;
 
-
+	/*_+DamageTags*/
+	FGameplayTag Damage;
+	FGameplayTag Effects_HitReact;
+	
+	/*SocketTags*/
+	FGameplayTag CombatSocket_Weapon;
+	FGameplayTag CombatSocket_RightHand;
+	FGameplayTag CombatSocket_LeftHand;
 
 private:
 

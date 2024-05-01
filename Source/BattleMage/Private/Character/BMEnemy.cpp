@@ -3,6 +3,7 @@
 
 #include "Character/BMEnemy.h"
 
+#include "BMGameplayTags.h"
 #include "AbilitySystem/BlueprintSystemLibrary.h"
 #include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "AbilitySystem/BMAttributeSet.h"
@@ -14,6 +15,8 @@ ABMEnemy::ABMEnemy(const FObjectInitializer& ObjectInitializer)
 :Super(ObjectInitializer.SetDefaultSubobjectClass<UBmCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 
 {
+
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility,ECR_Block);
 	AbilitySystemComponent = CreateDefaultSubobject<UBMAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
@@ -26,10 +29,14 @@ ABMEnemy::ABMEnemy(const FObjectInitializer& ObjectInitializer)
 	AttributeSet = CreateDefaultSubobject<UBMAttributeSet>("Attribute");
 }
 
+
+
 void ABMEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	InitAbilityActorInfo();
+	UBlueprintSystemLibrary::GiveStartupAbilities(this,AbilitySystemComponent);
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 
 	if(UBMUserWidget* BMUserWidget = Cast<UBMUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -50,11 +57,17 @@ void ABMEnemy::BeginPlay()
 				OnMaxHealthChanged.Broadcast(Data.NewValue);
 			}
 		);
+		AbilitySystemComponent->RegisterGameplayTagEvent(FBattleMageGameplayTags::Get().Effects_HitReact,EGameplayTagEventType::NewOrRemoved).AddUObject(
+			this,&ABMEnemy::HitReactTagChanged);
 		OnHealthChanged.Broadcast(BMAS->GetHealth());
 		OnMaxHealthChanged.Broadcast(BMAS->GetMaxHealth());
 	}
 }
-
+void ABMEnemy::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+}
 
 void ABMEnemy::InitAbilityActorInfo()
 {

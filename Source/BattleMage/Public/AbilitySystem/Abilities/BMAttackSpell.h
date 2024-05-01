@@ -16,7 +16,7 @@ UCLASS()
 class BATTLEMAGE_API UBMAttackSpell : public UBMDamageGameplayAbility
 {
 	GENERATED_BODY()
-	
+
 
 protected:
 

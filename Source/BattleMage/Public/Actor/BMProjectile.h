@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "GameFramework/Actor.h"
 #include "BMProjectile.generated.h"
 
@@ -27,6 +28,9 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 
+	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
+	FGameplayEffectSpecHandle DamageEffectSpecHandle;
+
 	UPROPERTY()
 	TObjectPtr<USceneComponent> HomingTargetSceneComponent;
 
@@ -40,7 +44,7 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	TObjectPtr<USphereComponent> Sphere;
 
-	/*bool IsValidOverlap(AActor* OtherActor);*/
+	bool IsValidOverlap(AActor* OtherActor);
 
 	bool bHit = false;
 
@@ -48,6 +52,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	float LifeSpan = 10.f;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UParticleSystem> ImpactCascadeEffect;
 	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraSystem> ImpactEffect;

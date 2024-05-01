@@ -6,6 +6,7 @@
 #include "BMGameplayTags.h"
 #include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "Character/BMCharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Player/BMPlayerState.h"
 #include "Weapon/Weapon.h"
 
@@ -22,6 +23,11 @@ void ABMCharacterBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+void ABMCharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 
 UAbilitySystemComponent* ABMCharacterBase::GetAbilitySystemComponent() const
 {
@@ -54,10 +60,21 @@ FVector ABMCharacterBase::GetCombatSocketLocation_Implementation(const FGameplay
 	return FVector();
 }
 
-void ABMCharacterBase::BeginPlay()
+void ABMCharacterBase::Die()
 {
-	Super::BeginPlay();
+	MulticastHandleDeath();
 }
+
+void ABMCharacterBase::MulticastHandleDeath_Implementation()
+{
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetEnableGravity(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic,ECR_Block);
+	
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 
 void ABMCharacterBase::InitAbilityActorInfo()
 {

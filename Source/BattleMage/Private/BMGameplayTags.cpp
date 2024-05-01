@@ -8,6 +8,7 @@ FBattleMageGameplayTags FBattleMageGameplayTags::GameplayTags;
 
 void FBattleMageGameplayTags::InitializeNativeGameplayTags()
 {
+	/*Primary Attributes*/
 	GameplayTags.Attributes_Primary_Strength = UGameplayTagsManager::Get().AddNativeGameplayTag(
 	FName("Attributes.Primary.Strength"),
 	FString("Increases physical damage"));
@@ -57,9 +58,9 @@ void FBattleMageGameplayTags::InitializeNativeGameplayTags()
 	FName("Attributes.Secondary.ManaRegeneration"),
 	FString("Amount of Mana regenerated every 1 second"));
 	
-	/*GameplayTags.Attributes_Secondary_StaminaRegeneration = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	GameplayTags.Attributes_Secondary_StaminaRegeneration = UGameplayTagsManager::Get().AddNativeGameplayTag(
 	FName("Attributes.Secondary.StaminaRegeneration"),
-	FString("Amount of Stamina regenerated every 1 second"));*/
+	FString("Amount of Stamina regenerated every 1 second"));
 	
 	GameplayTags.Attributes_Secondary_MaxHealth = UGameplayTagsManager::Get().AddNativeGameplayTag(
 	FName("Attributes.Secondary.MaxHealth"),
@@ -69,9 +70,11 @@ void FBattleMageGameplayTags::InitializeNativeGameplayTags()
 	FName("Attributes.Secondary.MaxMana"),
 	FString("Maximum amount of Mana obtainable"));
 	
-	/*GameplayTags.Attributes_Secondary_MaxStamina = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	GameplayTags.Attributes_Secondary_MaxStamina = UGameplayTagsManager::Get().AddNativeGameplayTag(
 	FName("Attributes.Secondary.MaxStamina"),
-	FString("Maximum amount of Stamina obtainable"));*/
+	FString("Maximum amount of Stamina obtainable"));
+
+	/*Input tags*/
 	
 	GameplayTags.InputTag_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag
 	(FName("InputTag.LMB"),
@@ -126,11 +129,19 @@ void FBattleMageGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Player_Block_InputReleased = UGameplayTagsManager::Get().AddNativeGameplayTag
 	(FName("Player.Block.InputReleased"),
 	FString("Block The InputReleased buttons"));
-
-		
+	
 	GameplayTags.Player_Block_InputPressed = UGameplayTagsManager::Get().AddNativeGameplayTag
 	(FName("Player.Block.InputPressed"),
 	FString("Block The Input pressed buttons"));
+
+	
+	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("Damage"),
+	FString("Damage"));
+	
+	GameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("Effects.HitReact"),
+	FString("HitReact"));
 
 	
 }

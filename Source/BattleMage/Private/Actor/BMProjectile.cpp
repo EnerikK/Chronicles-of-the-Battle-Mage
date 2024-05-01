@@ -39,55 +39,51 @@ void ABMProjectile::BeginPlay()
 
 void ABMProjectile::OnHit()
 {
-	/*UGameplayStatics::PlaySoundAtLocation(this,ImpactSound,GetActorLocation(),FRotator::ZeroRotator);
+	UGameplayStatics::PlaySoundAtLocation(this,ImpactSound,GetActorLocation(),FRotator::ZeroRotator);
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this,ImpactEffect,GetActorLocation());
-	
-	bHit = true;*/
+	UGameplayStatics::SpawnEmitterAtLocation(this,ImpactCascadeEffect,GetActorLocation());
+	bHit = true;
 }
 
 void ABMProjectile::Destroyed()
 {
-	/*if(!bHit && !HasAuthority()) OnHit();
-	Super::Destroyed();*/
-	if (!bHit && !HasAuthority())
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-	}
+	if(!bHit && !HasAuthority()) OnHit();
 	Super::Destroyed();
 }
 
 void ABMProjectile::OnSphereOverlap(UPrimitiveComponent* OverLappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	/*if (!IsValidOverlap(OtherActor)) return;
+	if (!IsValidOverlap(OtherActor)) return;
 	if (!bHit) OnHit();
 
 	if(HasAuthority())
 	{
-		if(UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
+		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 		{
-			const FVector DeathImpulse = GetActorForwardVector();
+			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
 		}
-		Destroy();
-	}
-	else bHit = true;*/
-	if (HasAuthority())
-	{
+
 		Destroy();
 	}
 	else
 	{
 		bHit = true;
 	}
+	/*if (HasAuthority())
+	{
+		Destroy();
+	}
+	else
+	{
+		bHit = true;
+	}*/
 }
 
-/*
 bool ABMProjectile::IsValidOverlap(AActor* OtherActor)
 {
 	return true;
 }
-*/
 
 
 

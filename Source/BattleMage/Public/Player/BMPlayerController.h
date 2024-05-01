@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "BMPlayerController.generated.h"
 
+class UTextDamage;
 class UCombatComponent;
 class UBMInputConfig;
 struct FGameplayTag;
@@ -30,6 +31,9 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Tick(float DeltaSeconds) override;
 
+	UFUNCTION(Client,Reliable)
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter);
+
 
 	UPROPERTY(Replicated)
 	bool bDisableGameplay = false;
@@ -52,6 +56,9 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<UBMAbilitySystemComponent> AuraAbilitySystemComponent;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UTextDamage> DamageTextComponentClass;
 
 	void CursorTrace();
 	IEnemyInterface* LastActor;

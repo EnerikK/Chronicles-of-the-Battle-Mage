@@ -12,6 +12,7 @@
 #include "GameFramework/Controller.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/Character.h"
+#include "HUD/Widget/TextDamage.h"
 #include "Input/BMInputComponent.h"
 #include "Interaction/CombatComponent.h"
 #include "Interaction/EnemyInterface.h"
@@ -34,6 +35,20 @@ void ABMPlayerController::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	CursorTrace();
 }
+
+void ABMPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter)
+{
+	if(IsValid(TargetCharacter) && DamageTextComponentClass)
+	{
+		UTextDamage* DamageText = NewObject<UTextDamage>(TargetCharacter,DamageTextComponentClass);
+		DamageText->RegisterComponent();
+		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(),FAttachmentTransformRules::KeepRelativeTransform);
+		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		DamageText->SetDamageText(DamageAmount);
+		
+	}
+}
+
 void ABMPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
