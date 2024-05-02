@@ -69,12 +69,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	ECharacterClass GetCharacterClass();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void WeaponCollision(float Radius , float End);
+	
 	virtual void Die() = 0;
 
-	
 
-
-	
-	
-	
 };

@@ -6,6 +6,7 @@
 #include "AbilitySystem/Abilities/BMDamageGameplayAbility.h"
 #include "BMChargeAttack.generated.h"
 
+class AWeapon;
 /**
  * 
  */
@@ -21,13 +22,13 @@ public:
 	
 	ECombatState CombatState;
 
+	UPROPERTY()
+	UCombatComponent* Combat;
+
 protected:
-
-	virtual void ActivateAbility
-	(const FGameplayAbilitySpecHandle Handle,const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-
-	virtual void GenerateAttack(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag,
+	
+	UFUNCTION(BlueprintCallable,Category="MeleeAttack")
+	virtual void GenerateAttack(const FGameplayTag& SocketTag,
 	bool bOverridePitch, float PitchOverride, AActor* HomingTarget);
 	
 	UPROPERTY(BlueprintReadWrite , Category = "Strike")

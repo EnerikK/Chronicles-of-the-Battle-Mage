@@ -10,8 +10,11 @@
  * 
  */
 UCLASS()
-class BATTLEMAGE_API AMeleeWeapon : public AWeapon
+class BATTLEMAGE_API AMeleeWeapon : public AWeapon 
 {
 	GENERATED_BODY()
+
+public:
+
 	
 };

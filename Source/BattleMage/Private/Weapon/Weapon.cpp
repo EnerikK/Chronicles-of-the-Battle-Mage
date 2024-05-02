@@ -31,6 +31,8 @@ AWeapon::AWeapon()
 	PickUpWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickUpWidget"));
 	PickUpWidget->SetupAttachment(RootComponent);
 
+	
+
 }
 
 FVector AWeapon::GetSocketLocation(FName SocketName)
@@ -81,8 +83,6 @@ void AWeapon::Dropped()
 	PlayerCharacter = nullptr;
 	PlayerController = nullptr;
 }
-
-
 void AWeapon::ShowPickUpWidget(bool bShowWidget)
 {
 	if(PickUpWidget)

@@ -2,10 +2,15 @@
 
 
 #include "Character/BMCharacter.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "BMGameplayTags.h"
 #include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Character/BMCharacterMovementComponent.h"
+#include "Components/ArrowComponent.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -50,7 +55,6 @@ ABMCharacter::ABMCharacter(const FObjectInitializer& ObjectInitializer)
 	BMMotionWarping = CreateDefaultSubobject<UBMMotionWarping>("BMMotionWarping");
 	BMMotionWarping->SetIsReplicated(true);
 	
-
 	TurningInPlace = ETurnInPlace::ETurnIP_NotTurning;
 }
 
@@ -70,7 +74,6 @@ FVector ABMCharacter::GetHitTarget() const
 void ABMCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 	SlideStartDelegate.Broadcast();
 }
 void ABMCharacter::PossessedBy(AController* NewController)
@@ -134,6 +137,37 @@ int32 ABMCharacter::GetPlayerLevel_Implementation()
 	
 }
 
+void ABMCharacter::WeaponCollision_Implementation(float Radius, float End)
+{
+	if(IsWeaponEquipped())
+	{
+		FVector StartSphere = Combat->EquippedWeapon->GetWeaponMesh()->GetSocketLocation("Start");
+		FVector EndSphere = Combat->EquippedWeapon->GetWeaponMesh()->GetSocketLocation("End");
+		TArray<AActor*> ActorsToIgnore;
+		ActorsToIgnore.Add(GetOwner());
+		TArray<FHitResult> HitArray;
+		TArray<TEnumAsByte<EObjectTypeQuery>> objectTypesArray;
+		objectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+	
+	
+		const bool Hit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(),StartSphere,EndSphere,Radius,
+			objectTypesArray,false,
+			ActorsToIgnore,EDrawDebugTrace::Persistent,HitArray,true,FLinearColor::Gray,
+			FLinearColor::Blue,5.f);
+	
+		if(Hit)
+		{
+			for(const FHitResult HitResult : HitArray)
+			{
+				AActor* ActorHit  = HitResult.GetActor();
+				GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Orange,FString::Printf(TEXT("Hit %s"),*ActorHit->GetName()));
+				
+			}
+		}
+	}
+}
+
+
 /*Weapons*/
 void ABMCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 {
@@ -184,6 +218,7 @@ bool ABMCharacter::IsWeaponEquipped()
 {
 	return (Combat && Combat->EquippedWeapon);
 }
+
 
 void ABMCharacter::PlaySwapMontage()
 {

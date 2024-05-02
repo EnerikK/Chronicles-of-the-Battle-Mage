@@ -40,7 +40,6 @@ void UBMAttackSpell::SpawnProjectile(const FVector& HitTarget,const FVector& Pro
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
 		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass,GetAbilityLevel(),SourceASC->MakeEffectContext());
 		Projectile->DamageEffectSpecHandle = SpecHandle;
-
 		
 		const FBattleMageGameplayTags GameplayTags = FBattleMageGameplayTags::Get();
 		const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());

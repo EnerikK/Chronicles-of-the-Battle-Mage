@@ -3,9 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "GameFramework/Actor.h"
+#include "Interaction/CombatInterface.h"
 #include "Weapon.generated.h"
 
+class UBoxComponent;
+class UArrowComponent;
 class UWidgetComponent;
 class USphereComponent;
 class ABMPlayerController;
@@ -51,14 +55,15 @@ public:
 	FORCEINLINE USphereComponent* GetPickUpSphere() const {return PickUpSphere;}
 	FORCEINLINE EWeaponType GetWeaponType() const {return WeaponType;}
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh()const {return WeaponMesh;}
-
 	
 	UPROPERTY(EditDefaultsOnly)
 	TArray<UAnimMontage* > AttackMontages;
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<UAnimMontage* > HeavyAttackMontages;
-
+	
+	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
+	FGameplayEffectSpecHandle DamageEffectSpecHandle;
 	
 	/*
 	* Texture for the cross-hairs
@@ -103,7 +108,7 @@ protected:
 	void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent,AActor* OtherActor,UPrimitiveComponent* OtherComp,int32 OtherBodyIndex);
 
 private:
-
+	
 	UPROPERTY(VisibleAnywhere,Category="Weapon Properties")
 	USkeletalMeshComponent* WeaponMesh;
 
@@ -115,7 +120,7 @@ private:
 	
 	UFUNCTION()
 	void OnRep_WeaponState();
-
+	
 	UPROPERTY(VisibleAnywhere,Category="Weapon Properties")
 	UWidgetComponent* PickUpWidget;
 

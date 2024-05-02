@@ -11,6 +11,7 @@
 #include "Types/TurnInPlace.h"
 #include "BMCharacter.generated.h"
 
+class UBoxComponent;
 class UBMMotionWarping;
 class ABMPlayerState;
 class UBmCharacterMovementComponent;
@@ -43,12 +44,14 @@ public:
 
 	/*Combat Interface*/
 	virtual int32 GetPlayerLevel_Implementation() override;
+	virtual void WeaponCollision_Implementation(float Radius, float End) override;
 
 	/*Weapons*/
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	void EquipButtonPressed();
 	AWeapon* GetEquippedWeapon();
 	bool IsWeaponEquipped();
+	
 	
 	bool bFinishedSwapping = false;
 	void PlaySwapMontage();
