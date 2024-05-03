@@ -11,6 +11,7 @@
 
 #define TRACE 80000.f
 
+class AWeapon;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnASCRegistered, UAbilitySystemComponent*);
 
 
@@ -70,7 +71,8 @@ public:
 	ECharacterClass GetCharacterClass();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void WeaponCollision(float Radius , float End);
+	void WeaponCollision(AWeapon* CurrentWeapon,float Radius , float End);
+	
 	
 	virtual void Die() = 0;
 

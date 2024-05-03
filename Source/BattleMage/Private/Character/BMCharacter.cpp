@@ -51,7 +51,7 @@ ABMCharacter::ABMCharacter(const FObjectInitializer& ObjectInitializer)
 
 	Combat = CreateDefaultSubobject<UCombatComponent>("Combat");
 	Combat->SetIsReplicated(true);
-
+	
 	BMMotionWarping = CreateDefaultSubobject<UBMMotionWarping>("BMMotionWarping");
 	BMMotionWarping->SetIsReplicated(true);
 	
@@ -137,10 +137,11 @@ int32 ABMCharacter::GetPlayerLevel_Implementation()
 	
 }
 
-void ABMCharacter::WeaponCollision_Implementation(float Radius, float End)
+void ABMCharacter::WeaponCollision_Implementation(AWeapon* CurrentWeapon,float Radius, float End)
 {
 	if(IsWeaponEquipped())
 	{
+		CurrentWeapon = Combat->EquippedWeapon;
 		FVector StartSphere = Combat->EquippedWeapon->GetWeaponMesh()->GetSocketLocation("Start");
 		FVector EndSphere = Combat->EquippedWeapon->GetWeaponMesh()->GetSocketLocation("End");
 		TArray<AActor*> ActorsToIgnore;
@@ -148,24 +149,35 @@ void ABMCharacter::WeaponCollision_Implementation(float Radius, float End)
 		TArray<FHitResult> HitArray;
 		TArray<TEnumAsByte<EObjectTypeQuery>> objectTypesArray;
 		objectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-	
-	
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(GetOwner());
+
 		const bool Hit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(),StartSphere,EndSphere,Radius,
 			objectTypesArray,false,
 			ActorsToIgnore,EDrawDebugTrace::Persistent,HitArray,true,FLinearColor::Gray,
 			FLinearColor::Blue,5.f);
-	
+		
 		if(Hit)
 		{
 			for(const FHitResult HitResult : HitArray)
 			{
-				AActor* ActorHit  = HitResult.GetActor();
-				GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Orange,FString::Printf(TEXT("Hit %s"),*ActorHit->GetName()));
+				AActor* HitActor = HitResult.GetActor();
+				GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Orange,FString::Printf(TEXT("Hit %s"),*HitActor->GetName()));
 				
+				if(HasAuthority())
+				{
+					if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitActor))
+					{
+						TargetASC->ApplyGameplayEffectSpecToSelf(*CurrentWeapon->DamageEffectSpecHandle.Data.Get());
+					}
+		
+				}
 			}
 		}
 	}
 }
+	
+
 
 
 /*Weapons*/
@@ -252,7 +264,6 @@ bool ABMCharacter::IsStateEqualToAnyInCode(TArray<ECombatState> StatesToCheck)
 	}
 	return false;
 }
-
 void ABMCharacter::PerformLightAttackInCode(int32 CurrentAttackIndex)
 {
 	AttackIndexInCode = CurrentAttackIndex;
@@ -298,7 +309,6 @@ bool ABMCharacter::PerformHeavyAttackInCode(int32 CurrentAttackIndex)
 	}
 	return false;
 }
-
 void ABMCharacter::AttackEvent()
 {
 	if(Combat->CombatState != ECombatState::ECState_Attack)

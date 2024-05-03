@@ -44,7 +44,7 @@ public:
 
 	/*Combat Interface*/
 	virtual int32 GetPlayerLevel_Implementation() override;
-	virtual void WeaponCollision_Implementation(float Radius, float End) override;
+	virtual void WeaponCollision_Implementation(AWeapon* CurrentWeapon,float Radius, float End) override;
 
 	/*Weapons*/
 	void SetOverlappingWeapon(AWeapon* Weapon);

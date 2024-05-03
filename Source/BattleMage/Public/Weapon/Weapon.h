@@ -54,6 +54,7 @@ public:
 
 	FORCEINLINE USphereComponent* GetPickUpSphere() const {return PickUpSphere;}
 	FORCEINLINE EWeaponType GetWeaponType() const {return WeaponType;}
+	
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh()const {return WeaponMesh;}
 	
 	UPROPERTY(EditDefaultsOnly)
@@ -64,6 +65,9 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
 	FGameplayEffectSpecHandle DamageEffectSpecHandle;
+
+	UPROPERTY(BlueprintReadWrite,VisibleAnywhere,Category="Weapon Properties")
+	USkeletalMeshComponent* WeaponMesh;
 	
 	/*
 	* Texture for the cross-hairs
@@ -109,8 +113,7 @@ protected:
 
 private:
 	
-	UPROPERTY(VisibleAnywhere,Category="Weapon Properties")
-	USkeletalMeshComponent* WeaponMesh;
+	
 
 	UPROPERTY(VisibleAnywhere,Category="Weapon Properties")
 	USphereComponent* PickUpSphere;

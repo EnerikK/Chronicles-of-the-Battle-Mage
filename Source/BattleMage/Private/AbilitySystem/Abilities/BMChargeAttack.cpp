@@ -26,17 +26,19 @@ void UBMChargeAttack::GenerateAttack(const FGameplayTag& SocketTag,
 	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
 	if(!bIsServer)return;
 
+	AWeapon* EquippedWeapon = Cast<AWeapon>(PlayerCharacter->GetEquippedWeapon());
+
 	ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo());
-	if (CombatInterface)
+	if (CombatInterface && EquippedWeapon)
 	{
-		
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
 		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass,GetAbilityLevel(),SourceASC->MakeEffectContext());
-		Combat->EquippedWeapon->DamageEffectSpecHandle;
+		EquippedWeapon->DamageEffectSpecHandle = SpecHandle;
 		
 		const FBattleMageGameplayTags GameplayTags = FBattleMageGameplayTags::Get();
 		const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
 		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle,GameplayTags.Damage,ScaledDamage);
+
 		
 	}
 	

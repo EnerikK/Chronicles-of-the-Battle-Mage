@@ -17,7 +17,7 @@ class ABMHud;
 class ABMPlayerController;
 class ABMCharacter;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class BATTLEMAGE_API UCombatComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -39,7 +39,6 @@ public:
 	void FinishSwap();
 	UFUNCTION(BlueprintCallable)
 	void FinishSwapWeapon();
-	
 	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;

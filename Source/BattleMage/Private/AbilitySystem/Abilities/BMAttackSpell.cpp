@@ -44,9 +44,7 @@ void UBMAttackSpell::SpawnProjectile(const FVector& HitTarget,const FVector& Pro
 		const FBattleMageGameplayTags GameplayTags = FBattleMageGameplayTags::Get();
 		const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
 		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle,GameplayTags.Damage,ScaledDamage);
-
-		//TODO: Give the Projectile a Gameplay Effect Spec for causing Damage.
-
+		
 		Projectile->FinishSpawning(SpawnTransform);
 	}
 }

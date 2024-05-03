@@ -4,14 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystem/Abilities/BMDamageGameplayAbility.h"
-#include "BMChargeAttack.generated.h"
+#include "LightAttack.generated.h"
 
-class AWeapon;
 /**
  * 
  */
 UCLASS()
-class BATTLEMAGE_API UBMChargeAttack : public UBMDamageGameplayAbility
+class BATTLEMAGE_API ULightAttack : public UBMDamageGameplayAbility
 {
 	GENERATED_BODY()
 
@@ -19,18 +18,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void StoreOwnerVariables();
-	
-	ECombatState CombatState;
 
-	UPROPERTY()
-	UCombatComponent* CombatComponent;
-
-protected:
-	
-	UFUNCTION(BlueprintCallable,Category="MeleeAttack")
-	virtual void GenerateAttack(const FGameplayTag& SocketTag,
-	bool bOverridePitch, float PitchOverride, AActor* HomingTarget);
-	
 	UPROPERTY(BlueprintReadWrite , Category = "Strike")
 	TObjectPtr<APlayerController> OwnerPlayerController;
 
@@ -39,7 +27,5 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite , Category = "Strike")
 	TObjectPtr<ABMCharacter> PlayerCharacter;
-	
-	
 	
 };

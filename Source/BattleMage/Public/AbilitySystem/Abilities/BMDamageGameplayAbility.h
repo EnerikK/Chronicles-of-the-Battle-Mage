@@ -19,6 +19,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CauseDamage(AActor* TargetActor);
 	
+	
 	UFUNCTION(BlueprintPure)
 	float GetDamageAtLevel()const;
 
