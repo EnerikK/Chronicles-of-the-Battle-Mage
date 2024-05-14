@@ -11,6 +11,7 @@
 #include "Types/TurnInPlace.h"
 #include "BMCharacter.generated.h"
 
+class UCollisionHandlerComponent;
 class UBoxComponent;
 class UBMMotionWarping;
 class ABMPlayerState;
@@ -22,6 +23,10 @@ class ABMHud;
 class USpringArmComponent;
 class UCameraComponent;
 class UTexture2D;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCollisionDetected, const FHitResult&, HitResult);
+
+
 
 #define TRACE 80000.f
 /**
@@ -44,7 +49,8 @@ public:
 
 	/*Combat Interface*/
 	virtual int32 GetPlayerLevel_Implementation() override;
-	virtual void WeaponCollision_Implementation(AWeapon* CurrentWeapon,float Radius, float End) override;
+	virtual void WeaponCollision_Implementation(AWeapon* CurrentWeapon,float Radius, float  , TArray<FHitResult>& outHits) override;
+	FRotator GetLineRotation(FVector Start,FVector End);
 
 	/*Weapons*/
 	void SetOverlappingWeapon(AWeapon* Weapon);
@@ -100,6 +106,8 @@ public:
 	/*Delegates*/
 	UPROPERTY()
 	FSlideStartDelegate SlideStartDelegate;
+	UPROPERTY()
+	FOnCollisionDetected OnCollisionDetected;
 	
 	/*Getters*/
 	FORCEINLINE float GetAO_Yaw() const {return AO_Yaw;}
@@ -138,7 +146,7 @@ private:
 	
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,meta = (AllowPrivateAccess = true))
 	UCombatComponent* Combat;
-
+	
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,meta = (AllowPrivateAccess = true))
 	UBMMotionWarping* BMMotionWarping;
 	

@@ -7,6 +7,7 @@
 #include "BMGameplayTags.h"
 #include "GameFramework/Character.h"
 #include "GameplayEffectExtension.h"
+#include "AbilitySystem/BlueprintSystemLibrary.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -32,6 +33,12 @@ UBMAttributeSet::UBMAttributeSet()
 	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_ManaRegeneration, GetManaRegenerationAttribute);
 	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_MaxHealth, GetMaxHealthAttribute);
 	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_MaxMana, GetMaxManaAttribute);
+
+	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Fire,GetFireResistanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Water,GetWaterResistanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Earth,GetEarthResistanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Wind,GetWindResistanceAttribute);
+
 
 }
 
@@ -64,6 +71,15 @@ void UBMAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_CONDITION_NOTIFY(UBMAttributeSet,HealthRegeneration,COND_None,REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBMAttributeSet,ManaRegeneration,COND_None,REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBMAttributeSet,StaminaRegeneration,COND_None,REPNOTIFY_Always);
+
+	/*Resistances*/
+
+	DOREPLIFETIME_CONDITION_NOTIFY(UBMAttributeSet,FireResistance,COND_None,REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBMAttributeSet,WaterResistance,COND_None,REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBMAttributeSet,EarthResistance,COND_None,REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBMAttributeSet,WindResistance,COND_None,REPNOTIFY_Always);
+
+
 	
 }
 
@@ -124,19 +140,20 @@ void UBMAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 				TagContainer.AddTag(FBattleMageGameplayTags::Get().Effects_HitReact);
 				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 			}
-			ShowFloatingText(Props,LocalIncomingDamage);
-			
+			const bool bBlock = UBlueprintSystemLibrary::IsBlockedHit(Props.EffectContextHandle);
+			const bool bCriticalHit = UBlueprintSystemLibrary::IsCriticalHit(Props.EffectContextHandle);
+			ShowFloatingText(Props,LocalIncomingDamage,bBlock,bCriticalHit);
 		}
 	}
 }
 
-void UBMAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage)
+void UBMAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage,bool bBlockedHit,bool bCriticalHit)
 {
 	if(Props.SourceCharacter != Props.TargetCharacter)
 	{
 		if(ABMPlayerController* PlayerController = Cast<ABMPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter,0)))
 		{
-			PlayerController->ShowDamageNumber(Damage,Props.TargetCharacter);
+			PlayerController->ShowDamageNumber(Damage,Props.TargetCharacter,bBlockedHit,bCriticalHit);
 		}
 	}
 }
@@ -288,4 +305,26 @@ void UBMAttributeSet::OnRep_StaminaRegeneration(const FGameplayAttributeData& Ol
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,StaminaRegeneration,OldStaminaRegeneration);
 
 }
+
+void UBMAttributeSet::OnRep_FireResistance(const FGameplayAttributeData& OldFireResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,FireResistance,OldFireResistance);
+}
+
+void UBMAttributeSet::OnRep_WaterResistance(const FGameplayAttributeData& OldWaterResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,WaterResistance,OldWaterResistance);
+}
+
+void UBMAttributeSet::OnRep_EarthResistance(const FGameplayAttributeData& OldEarthResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,EarthResistance,OldEarthResistance);
+}
+
+void UBMAttributeSet::OnRep_WindResistance(const FGameplayAttributeData& OldWindResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBMAttributeSet,WindResistance,OldWindResistance);
+}
+
+
 

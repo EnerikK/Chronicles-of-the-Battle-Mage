@@ -2,15 +2,10 @@
 
 
 #include "Character/BMCharacter.h"
-
-#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "BMGameplayTags.h"
 #include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Character/BMCharacterMovementComponent.h"
-#include "Components/ArrowComponent.h"
-#include "Components/BoxComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -22,6 +17,8 @@
 #include "Player/BMPlayerController.h"
 #include "Player/BMPlayerState.h"
 #include "Weapon/Weapon.h"
+
+
 
 ABMCharacter::ABMCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UBmCharacterMovementComponent>(
@@ -126,6 +123,7 @@ void ABMCharacter::PostInitializeComponents()
 	{
 		BMMotionWarping->Character = this;
 	}
+
 	
 }
 
@@ -137,13 +135,14 @@ int32 ABMCharacter::GetPlayerLevel_Implementation()
 	
 }
 
-void ABMCharacter::WeaponCollision_Implementation(AWeapon* CurrentWeapon,float Radius, float End)
+void ABMCharacter::WeaponCollision_Implementation(AWeapon* CurrentWeapon,float Radius, float End , TArray<FHitResult>& outHits)
 {
 	if(IsWeaponEquipped())
 	{
 		CurrentWeapon = Combat->EquippedWeapon;
-		FVector StartSphere = Combat->EquippedWeapon->GetWeaponMesh()->GetSocketLocation("Start");
-		FVector EndSphere = Combat->EquippedWeapon->GetWeaponMesh()->GetSocketLocation("End");
+		const FVector StartSphere = Combat->EquippedWeapon->GetWeaponMesh()->GetSocketLocation("Start");
+		const FVector EndSphere = Combat->EquippedWeapon->GetWeaponMesh()->GetSocketLocation("End");
+		const FRotator Orientation = GetLineRotation(StartSphere,EndSphere);
 		TArray<AActor*> ActorsToIgnore;
 		ActorsToIgnore.Add(GetOwner());
 		TArray<FHitResult> HitArray;
@@ -151,33 +150,48 @@ void ABMCharacter::WeaponCollision_Implementation(AWeapon* CurrentWeapon,float R
 		objectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(GetOwner());
-
-		const bool Hit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(),StartSphere,EndSphere,Radius,
-			objectTypesArray,false,
-			ActorsToIgnore,EDrawDebugTrace::Persistent,HitArray,true,FLinearColor::Gray,
-			FLinearColor::Blue,5.f);
 		
+		//FHitResult HitResult;
+		//FCollisionObjectQueryParams ObjectParams;
+		
+		UWorld* World = GetWorld();
+		TArray<AActor*> AlreadyDamageActors;
+		AlreadyDamageActors.Empty();
+		
+		const bool Hit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(),StartSphere,EndSphere,Radius,
+		objectTypesArray,false,
+		ActorsToIgnore,EDrawDebugTrace::Persistent,HitArray,true,FLinearColor::Gray,
+		FLinearColor::Blue,5.f);
+
 		if(Hit)
 		{
-			for(const FHitResult HitResult : HitArray)
+			for(const auto& GotHit : HitArray)
 			{
-				AActor* HitActor = HitResult.GetActor();
-				GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Orange,FString::Printf(TEXT("Hit %s"),*HitActor->GetName()));
-				
-				if(HasAuthority())
+				AActor* HitActor = GotHit.GetActor();
+				if(!AlreadyDamageActors.Contains(HitActor))
 				{
-					if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitActor))
-					{
-						TargetASC->ApplyGameplayEffectSpecToSelf(*CurrentWeapon->DamageEffectSpecHandle.Data.Get());
-					}
-		
+					AlreadyDamageActors.AddUnique(HitActor);
+					if(AlreadyDamageActors.Num() > 1 ) return;
+					GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Orange,FString::Printf(TEXT("Hit %s"),*HitActor->GetName()));
+
 				}
 			}
 		}
+		
+			//AlreadyDamageActors.AddUnique(GotHit.GetActor());
+			/*if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(AlreadyDamageActors.HeapTop()))
+			{
+				TargetASC->ApplyGameplayEffectSpecToSelf(*Combat->EquippedWeapon->DamageEffectSpecHandle.Data.Get());
+			}
+			GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Orange,FString::Printf(TEXT("Hit %s"),*GotHit.GetActor()->GetName()));*/
 	}
 }
-	
 
+FRotator ABMCharacter::GetLineRotation(FVector Start, FVector End)
+{
+	const FVector diff = End - Start;
+	return diff.Rotation();
+}
 
 
 /*Weapons*/

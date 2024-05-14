@@ -4,6 +4,7 @@
 #include "AbilitySystem/BlueprintSystemLibrary.h"
 
 #include "AbilitySystemComponent.h"
+#include "BMAbilityTypes.h"
 #include "GameplayEffectTypes.h"
 #include "Game/BMGameModeBase.h"
 #include "HUD/BMHud.h"
@@ -72,7 +73,7 @@ void UBlueprintSystemLibrary::InitializeDefaultAttributes(const UObject* WorldCo
 
 	AActor* AvatarActor = ASC->GetAvatarActor();
 
-	UCharacterClassInfo* CharacterClassInfo = AuraGameMode->CharacterClassInfo;
+	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
 	FCharacterClassInfoAttributes ClassDefaultInfo = CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
 
 	FGameplayEffectContextHandle PrimaryAttributesContextHandle = ASC->MakeEffectContext();
@@ -96,10 +97,52 @@ void UBlueprintSystemLibrary::GiveStartupAbilities(const UObject* WorldContextOb
 	ABMGameModeBase* AuraGameMode = Cast<ABMGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (AuraGameMode == nullptr) return;
 	
-	UCharacterClassInfo* CharacterClassInfo = AuraGameMode->CharacterClassInfo;
+	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
 	for(TSubclassOf<UGameplayAbility> AbilityClass : CharacterClassInfo->CommonAbilities)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass,1);
 		ASC->GiveAbility(AbilitySpec);
+	}
+}
+
+UCharacterClassInfo* UBlueprintSystemLibrary::GetCharacterClassInfo(const UObject* WorldContextObject)
+{
+	ABMGameModeBase* BMGameMode = Cast<ABMGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if(BMGameMode == nullptr) return nullptr;
+	return BMGameMode->CharacterClassInfo;
+}
+
+bool UBlueprintSystemLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBMGameplayEffectContext* BMEffectContext = static_cast<const FBMGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return BMEffectContext->IsBlockedHit();
+	}
+	return false;
+}
+
+bool UBlueprintSystemLibrary::IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBMGameplayEffectContext* BMEffectContext = static_cast<const FBMGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return BMEffectContext->IsCriticalHit();
+	}
+	return false;
+}
+
+void UBlueprintSystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, bool bInIsBlockedHit)
+{
+	if (FBMGameplayEffectContext* BMEffectContext = static_cast<FBMGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		BMEffectContext->SetIsBlockedHit(bInIsBlockedHit);
+	}
+}
+
+void UBlueprintSystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& EffectContextHandle, bool bInIsCriticalHit)
+{
+	
+	if (FBMGameplayEffectContext* BMEffectContext = static_cast<FBMGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		BMEffectContext->SetIsCriticalHit(bInIsCriticalHit);
 	}
 }

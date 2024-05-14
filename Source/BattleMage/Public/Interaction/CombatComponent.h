@@ -40,7 +40,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FinishSwapWeapon();
 	
-	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
+	UPROPERTY(BlueprintReadWrite,ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
 
 	UPROPERTY(ReplicatedUsing= OnRep_SecondaryWeapon)

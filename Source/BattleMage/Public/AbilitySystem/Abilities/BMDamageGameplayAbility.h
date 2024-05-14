@@ -20,20 +20,17 @@ public:
 	void CauseDamage(AActor* TargetActor);
 	
 	
-	UFUNCTION(BlueprintPure)
-	float GetDamageAtLevel()const;
-
 protected:
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
 
+	UPROPERTY(EditDefaultsOnly,Category="Damage")
+	TMap<FGameplayTag,FScalableFloat> DamageTypes;
+	
 	UPROPERTY(EditDefaultsOnly, Category= "Damage")
 	FGameplayTag DamageType;
-
-	UPROPERTY(EditDefaultsOnly, Category= "Damage")
-	FScalableFloat Damage;
-
+	
 	UPROPERTY(EditDefaultsOnly, Category= "Damage")
 	float DebuffChance = 20.f;
 	

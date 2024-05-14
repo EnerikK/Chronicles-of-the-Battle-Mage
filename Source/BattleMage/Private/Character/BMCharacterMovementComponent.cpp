@@ -6,7 +6,6 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
-#include "DrawDebugHelpers.h"
 
 
 UBmCharacterMovementComponent::UBmCharacterMovementComponent()

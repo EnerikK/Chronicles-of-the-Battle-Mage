@@ -71,7 +71,7 @@ public:
 
 	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
 
-	void ShowFloatingText(const FEffectProperties& Props, float Damage);
+	void ShowFloatingText(const FEffectProperties& Props, float Damage,bool bBlockedHit,bool bCriticalHit);
 	
 	/*
 	* Primary Attributes
@@ -161,6 +161,24 @@ public:
 	FGameplayAttributeData StaminaRegeneration;
 	ATTRIBUTE_ACCESSORS(UBMAttributeSet, StaminaRegeneration);
 
+	/*Resistances*/
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_FireResistance, Category = "Resistance Attributes")
+	FGameplayAttributeData FireResistance;
+	ATTRIBUTE_ACCESSORS(UBMAttributeSet, FireResistance);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_WaterResistance, Category = "Resistance Attributes")
+	FGameplayAttributeData WaterResistance;
+	ATTRIBUTE_ACCESSORS(UBMAttributeSet, WaterResistance);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_EarthResistance, Category = "Resistance Attributes")
+	FGameplayAttributeData EarthResistance;
+	ATTRIBUTE_ACCESSORS(UBMAttributeSet, EarthResistance);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_WindResistance, Category = "Resistance Attributes")
+	FGameplayAttributeData WindResistance;
+	ATTRIBUTE_ACCESSORS(UBMAttributeSet, WindResistance);
+
 	/*Meta Attributes*/
 	UPROPERTY(BlueprintReadOnly,Category="MetaAttributes")
 	FGameplayAttributeData IncomingDamage;
@@ -227,6 +245,19 @@ public:
 
 	UFUNCTION()
 	void OnRep_StaminaRegeneration(const FGameplayAttributeData& OldStaminaRegeneration) const;
+
+	UFUNCTION()
+	void OnRep_FireResistance(const FGameplayAttributeData& OldFireResistance) const;
+
+	UFUNCTION()
+	void OnRep_WaterResistance(const FGameplayAttributeData& OldWaterResistance) const;
+
+	UFUNCTION()
+	void OnRep_EarthResistance(const FGameplayAttributeData& OldEarthResistance) const;
+
+	UFUNCTION()
+	void OnRep_WindResistance(const FGameplayAttributeData& OldWindResistance) const;
+	
 
 
 private:

@@ -46,14 +46,28 @@ struct FBattleMageGameplayTags
 	FGameplayTag Player_Block_InputReleased;
 	FGameplayTag Player_Block_InputPressed;
 
-	/*_+DamageTags*/
+	/*_+DamageTags && Resistance Tags*/
 	FGameplayTag Damage;
+	FGameplayTag Damage_Fire;
+	FGameplayTag Damage_Water;
+	FGameplayTag Damage_Earth;
+	FGameplayTag Damage_Wind;
+
+	FGameplayTag Attributes_Resistance_Fire;
+	FGameplayTag Attributes_Resistance_Water;
+	FGameplayTag Attributes_Resistance_Earth;
+	FGameplayTag Attributes_Resistance_Wind;
+
+
+	TMap<FGameplayTag,FGameplayTag> DamageTypeToResistance;
 	FGameplayTag Effects_HitReact;
 	
 	/*SocketTags*/
 	FGameplayTag CombatSocket_Weapon;
 	FGameplayTag CombatSocket_RightHand;
 	FGameplayTag CombatSocket_LeftHand;
+
+
 
 private:
 

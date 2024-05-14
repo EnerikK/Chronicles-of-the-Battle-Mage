@@ -26,13 +26,10 @@ AWeapon::AWeapon()
 	PickUpSphere->SetupAttachment(RootComponent);
 	PickUpSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
 	PickUpSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-
+	
 	PickUpWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickUpWidget"));
 	PickUpWidget->SetupAttachment(RootComponent);
-
 	
-
 }
 
 FVector AWeapon::GetSocketLocation(FName SocketName)
@@ -83,6 +80,8 @@ void AWeapon::Dropped()
 	PlayerCharacter = nullptr;
 	PlayerController = nullptr;
 }
+
+
 void AWeapon::ShowPickUpWidget(bool bShowWidget)
 {
 	if(PickUpWidget)

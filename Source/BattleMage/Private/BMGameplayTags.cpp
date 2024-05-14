@@ -138,6 +138,45 @@ void FBattleMageGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag
 	(FName("Damage"),
 	FString("Damage"));
+
+	GameplayTags.Damage_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("Damage.Fire"),
+	FString("Fire Damage"));
+
+	GameplayTags.Damage_Earth = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("Damage.Earth"),
+	FString("Earth Damage"));
+	
+	GameplayTags.Damage_Water = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("Damage.Water"),
+	FString("Water Damage"));
+	
+	GameplayTags.Damage_Wind = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("Damage.Wind"),
+	FString("Wind Damage"));
+
+	GameplayTags.Attributes_Resistance_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("Attributes.Resistance.Fire"),
+	FString("Fire Damage Resistance"));
+
+	GameplayTags.Attributes_Resistance_Water = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("Attributes.Resistance.Water"),
+	FString("Water Damage Resistance"));
+
+	GameplayTags.Attributes_Resistance_Earth = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("Attributes.Resistance.Earth"),
+	FString("Earth Damage Resistance"));
+
+	GameplayTags.Attributes_Resistance_Wind = UGameplayTagsManager::Get().AddNativeGameplayTag
+	(FName("Attributes.Resistance.Wind"),
+	FString("Wind Damage Resistance"));
+
+	/*-_+ Mapping The type of damage to its resistance*/
+	GameplayTags.DamageTypeToResistance.Add(GameplayTags.Damage_Fire,GameplayTags.Attributes_Resistance_Fire);
+	GameplayTags.DamageTypeToResistance.Add(GameplayTags.Damage_Water,GameplayTags.Attributes_Resistance_Water);
+	GameplayTags.DamageTypeToResistance.Add(GameplayTags.Damage_Earth,GameplayTags.Attributes_Resistance_Earth);
+	GameplayTags.DamageTypeToResistance.Add(GameplayTags.Damage_Wind,GameplayTags.Attributes_Resistance_Wind);
+	
 	
 	GameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag
 	(FName("Effects.HitReact"),

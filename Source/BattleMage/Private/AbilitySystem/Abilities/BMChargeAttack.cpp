@@ -36,8 +36,6 @@ void UBMChargeAttack::GenerateAttack(const FGameplayTag& SocketTag,
 		EquippedWeapon->DamageEffectSpecHandle = SpecHandle;
 		
 		const FBattleMageGameplayTags GameplayTags = FBattleMageGameplayTags::Get();
-		const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle,GameplayTags.Damage,ScaledDamage);
 
 		
 	}

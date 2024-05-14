@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameplayEffectTypes.h"
 #include "GameFramework/Actor.h"
-#include "Interaction/CombatInterface.h"
 #include "Weapon.generated.h"
 
+class UCollisionComponent;
 class UBoxComponent;
 class UArrowComponent;
 class UWidgetComponent;
@@ -51,11 +51,33 @@ public:
 	void SetWeaponState(EWeaponState State);
 	virtual void OnRep_Owner() override;
 	virtual void Dropped();
-
+	
 	FORCEINLINE USphereComponent* GetPickUpSphere() const {return PickUpSphere;}
+	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh()const {return WeaponMesh;}
+	
+	UFUNCTION(BlueprintPure, Category = Combat)
 	FORCEINLINE EWeaponType GetWeaponType() const {return WeaponType;}
 	
-	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh()const {return WeaponMesh;}
+	UFUNCTION(BlueprintPure, Category = Combat)
+	FORCEINLINE FGameplayTag GetWeaponTagType() const {return WeaponTagType;}
+	
+	UFUNCTION(BlueprintPure, Category = Combat)
+	FORCEINLINE FGameplayTag GetMovesetTag() const {return Moveset;}
+	
+	UFUNCTION(BlueprintPure, Category = Combat)
+	FORCEINLINE FGameplayTag GetMovesetActionTag() const  {return MovesetActions;}
+
+	UFUNCTION(BlueprintPure, Category = Combat)
+	FORCEINLINE FGameplayTag GetMovesetOverlayTag() const {return MovesetOverlay;}
+
+	UFUNCTION(BlueprintPure, Category = Combat)
+	FORCEINLINE FName GetOnBodySocketName() const {return OnBodySocketName;}
+
+	UFUNCTION(BlueprintPure, Category = Combat)
+	FORCEINLINE FName GetEquippedSocketName() const {return InHandsSocketName;}
+
+	UFUNCTION(BlueprintCallable, Category = ACF)
+	void SetHandleType(EWeaponType newType) { WeaponType = newType; }
 	
 	UPROPERTY(EditDefaultsOnly)
 	TArray<UAnimMontage* > AttackMontages;
@@ -97,12 +119,35 @@ protected:
 
 	UPROPERTY()
 	ABMPlayerController* PlayerController;
-	
+
 	virtual void BeginPlay() override;
 	virtual void OnWeaponStateSet();
 	virtual void OnEquipped();
 	virtual void OnDropped();
 	virtual void OnEquippedSecondary();
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Weapon")
+	EWeaponType WeaponType = EWeaponType::EW_Sword;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Weapon")
+	FGameplayTag WeaponTagType;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Weapon")
+	FGameplayTag Moveset;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Weapon")
+	FGameplayTag MovesetOverlay;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Weapon")
+	FGameplayTag MovesetActions;
+
+	/*Socket in which this weapon will be attached once it is equipped on the back of the character*/
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Weapon")
+	FName OnBodySocketName;
+
+	/*Socket in which this weapon will be attached once it is unsheathed*/
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Weapon")
+	FName InHandsSocketName;
 	
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent,AActor* OtherActor,UPrimitiveComponent* OtherComp,int32 OtherBodyIndex,
@@ -112,7 +157,6 @@ protected:
 	void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent,AActor* OtherActor,UPrimitiveComponent* OtherComp,int32 OtherBodyIndex);
 
 private:
-	
 	
 
 	UPROPERTY(VisibleAnywhere,Category="Weapon Properties")
@@ -126,8 +170,5 @@ private:
 	
 	UPROPERTY(VisibleAnywhere,Category="Weapon Properties")
 	UWidgetComponent* PickUpWidget;
-
-	UPROPERTY(EditAnywhere)
-	EWeaponType WeaponType;
 	
 };

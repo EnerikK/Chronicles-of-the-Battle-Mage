@@ -20,8 +20,3 @@ FTaggedMontage UBMDamageGameplayAbility::GetRandomTaggedMontageFromArray(
 	}
 	return FTaggedMontage();
 }
-
-float UBMDamageGameplayAbility::GetDamageAtLevel() const
-{
-	return Damage.GetValueAtLevel(GetAbilityLevel());
-}

@@ -71,7 +71,7 @@ public:
 	ECharacterClass GetCharacterClass();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void WeaponCollision(AWeapon* CurrentWeapon,float Radius , float End);
+	void WeaponCollision(AWeapon* CurrentWeapon,float Radius , float End , TArray<FHitResult>& outHits);
 	
 	
 	virtual void Die() = 0;

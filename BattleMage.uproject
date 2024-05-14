@@ -14,7 +14,8 @@
 				"UMG",
 				"CoreUObject",
 				"EnhancedInput",
-				"MotionWarping"
+				"MotionWarping",
+				"AnimGraphRuntime"
 			]
 		}
 	],
