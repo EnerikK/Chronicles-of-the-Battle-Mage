@@ -151,7 +151,7 @@ void UBMAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Dam
 {
 	if(Props.SourceCharacter != Props.TargetCharacter)
 	{
-		if(ABMPlayerController* PlayerController = Cast<ABMPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter,0)))
+		if(ABMPlayerController* PlayerController = Cast<ABMPlayerController>(Props.SourceCharacter->Controller))
 		{
 			PlayerController->ShowDamageNumber(Damage,Props.TargetCharacter,bBlockedHit,bCriticalHit);
 		}

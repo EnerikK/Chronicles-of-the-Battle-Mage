@@ -2,12 +2,14 @@
 
 
 #include "Character/BMEnemy.h"
-
 #include "BMGameplayTags.h"
 #include "AbilitySystem/BlueprintSystemLibrary.h"
 #include "AbilitySystem/BMAbilitySystemComponent.h"
 #include "AbilitySystem/BMAttributeSet.h"
+#include "AI/BattleMageAIController.h"
 #include "BattleMage/BattleMage.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Character/BMCharacterMovementComponent.h"
 #include "Components/WidgetComponent.h"
 
@@ -15,12 +17,19 @@ ABMEnemy::ABMEnemy(const FObjectInitializer& ObjectInitializer)
 :Super(ObjectInitializer.SetDefaultSubobjectClass<UBmCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 
 {
-
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility,ECR_Block);
 	AbilitySystemComponent = CreateDefaultSubobject<UBMAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 
+	BMCharacterMovementComponent = Cast<UBmCharacterMovementComponent>(GetCharacterMovement());
+	BMCharacterMovementComponent->SetIsReplicated(true);
+	BMCharacterMovementComponent->bUseControllerDesiredRotation = true;
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = false;
+	
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
 	HealthBar->SetupAttachment(GetRootComponent());
 
@@ -29,15 +38,28 @@ ABMEnemy::ABMEnemy(const FObjectInitializer& ObjectInitializer)
 	AttributeSet = CreateDefaultSubobject<UBMAttributeSet>("Attribute");
 }
 
+void ABMEnemy::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if(!HasAuthority()) return;
+		
+	BattleMageAIController = Cast<ABattleMageAIController>(NewController);
+	BattleMageAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+	BattleMageAIController->RunBehaviorTree(BehaviorTree);
+	BattleMageAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReact"),false);
+}
 
 
 void ABMEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	InitAbilityActorInfo();
-	UBlueprintSystemLibrary::GiveStartupAbilities(this,AbilitySystemComponent);
-	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
-
+	BMCharacterMovementComponent->MaxWalkSpeed = BaseWalkSpeed;
+	if(HasAuthority())
+	{
+		UBlueprintSystemLibrary::GiveStartupAbilities(this,AbilitySystemComponent);
+	}
 	if(UBMUserWidget* BMUserWidget = Cast<UBMUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
 		BMUserWidget->SetWidgetController(this);
@@ -66,15 +88,21 @@ void ABMEnemy::BeginPlay()
 void ABMEnemy::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	bHitReacting = NewCount > 0;
-	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	BMCharacterMovementComponent->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	BattleMageAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReact"),bHitReacting);
+
 }
 
 void ABMEnemy::InitAbilityActorInfo()
 {
+	
 	AbilitySystemComponent->InitAbilityActorInfo(this,this);
 	Cast<UBMAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
-	InitializeDefaultAttributes();
+	if(HasAuthority())
+	{
+		InitializeDefaultAttributes();
+	}
 
 }
 

@@ -4,7 +4,6 @@
 
 bool FBMGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
 {
-
 	uint32 RepBits = 0;
 	if (Ar.IsSaving())
 	{
@@ -36,17 +35,17 @@ bool FBMGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bool
 		{
 			RepBits |= 1 << 6;
 		}
-		if (bIsBlockedHit)
+		if(bIsBlockedHit)
 		{
 			RepBits |= 1 << 7;
 		}
-		if (bIsCriticalHit)
+		if(bIsCriticalHit)
 		{
 			RepBits |= 1 << 8;
 		}
 	}
 
-	Ar.SerializeBits(&RepBits, 9);
+	Ar.SerializeBits(&RepBits,8);
 
 	if (RepBits & (1 << 0))
 	{
@@ -88,11 +87,11 @@ bool FBMGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bool
 	{
 		bHasWorldOrigin = false;
 	}
-	if (RepBits & (1 << 7))
+	if(RepBits & (1 << 7))
 	{
 		Ar << bIsBlockedHit;
 	}
-	if (RepBits & (1 << 8))
+	if(RepBits & (1 << 8))
 	{
 		Ar << bIsCriticalHit;
 	}

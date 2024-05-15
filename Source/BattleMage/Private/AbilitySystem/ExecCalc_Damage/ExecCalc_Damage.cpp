@@ -18,7 +18,13 @@ struct BMDamageStatics
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitChance);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitResistance);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitDamage);
+	/*Resistances*/
+	DECLARE_ATTRIBUTE_CAPTUREDEF(FireResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(WaterResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(EarthResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(WindResistance);
 
+	TMap<FGameplayTag,FGameplayEffectAttributeCaptureDefinition> TagsToCapture;
 	
 	BMDamageStatics()
 	{
@@ -28,7 +34,25 @@ struct BMDamageStatics
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UBMAttributeSet, CriticalHitChance, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UBMAttributeSet, CriticalHitResistance, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UBMAttributeSet, CriticalHitDamage, Source, false);
+		/*Resistances*/
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UBMAttributeSet, FireResistance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UBMAttributeSet, WaterResistance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UBMAttributeSet, EarthResistance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UBMAttributeSet, WindResistance, Target, false);
 
+		const FBattleMageGameplayTags& Tags = FBattleMageGameplayTags::Get();
+
+		TagsToCapture.Add(Tags.Attributes_Secondary_Armor,ArmorDef);
+		TagsToCapture.Add(Tags.Attributes_Secondary_ArmorPenetration,ArmorPenetrationDef);
+		TagsToCapture.Add(Tags.Attributes_Secondary_BlockChance,BlockChanceDef);
+		TagsToCapture.Add(Tags.Attributes_Secondary_CriticalHitChance,CriticalHitChanceDef);
+		TagsToCapture.Add(Tags.Attributes_Secondary_CriticalHitDamage,CriticalHitDamageDef);
+		TagsToCapture.Add(Tags.Attributes_Secondary_CriticalHitResistance,CriticalHitResistanceDef);
+
+		TagsToCapture.Add(Tags.Attributes_Resistance_Fire,FireResistanceDef);
+		TagsToCapture.Add(Tags.Attributes_Resistance_Water,WaterResistanceDef);
+		TagsToCapture.Add(Tags.Attributes_Resistance_Earth,EarthResistanceDef);
+		TagsToCapture.Add(Tags.Attributes_Resistance_Wind,WindResistanceDef);
 	}
 };
 
@@ -47,7 +71,11 @@ UExecCalc_Damage::UExecCalc_Damage()
 	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitDamageDef);
 	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitResistanceDef);
 
-
+	RelevantAttributesToCapture.Add(DamageStatics().FireResistanceDef);
+	RelevantAttributesToCapture.Add(DamageStatics().WaterResistanceDef);
+	RelevantAttributesToCapture.Add(DamageStatics().EarthResistanceDef);
+	RelevantAttributesToCapture.Add(DamageStatics().WindResistanceDef);
+	
 }
 
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
@@ -85,8 +113,20 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	float Damage = 0.f;
 	for(const TTuple<FGameplayTag,FGameplayTag>& Pair : FBattleMageGameplayTags::Get().DamageTypeToResistance)
 	{
-		const float DamageType = Spec.GetSetByCallerMagnitude(Pair.Key);
-		Damage += DamageType;
+		const FGameplayTag DamageType = Pair.Key;
+		const FGameplayTag ResistanceTag = Pair.Value;
+
+		checkf(BMDamageStatics().TagsToCapture.Contains(ResistanceTag),TEXT("Tags To Capture doesnt contain tag : [%s] in ExecDamage" ),*ResistanceTag.ToString());
+		const FGameplayEffectAttributeCaptureDefinition CaptureDefinition = BMDamageStatics().TagsToCapture[ResistanceTag];
+		
+		float DamageTypeValue = Spec.GetSetByCallerMagnitude(Pair.Key);
+		float Resistance = 0.f;
+
+		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CaptureDefinition,EvaluationParameters,Resistance);
+		Resistance = FMath::Clamp(Resistance,0.f,100.f);
+
+		DamageTypeValue *= (100.f - Resistance) / 100.f;
+		Damage += DamageTypeValue;
 	}
 	
 	float TargetBlockChance = 0.f;

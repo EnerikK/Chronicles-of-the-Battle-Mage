@@ -9,6 +9,9 @@
 #include "Interaction/EnemyInterface.h"
 #include "BMEnemy.generated.h"
 
+class UBmCharacterMovementComponent;
+class ABattleMageAIController;
+class UBehaviorTree;
 class UWidgetComponent;
 /**
  * 
@@ -20,6 +23,7 @@ class BATTLEMAGE_API ABMEnemy : public ABMCharacterBase , public IEnemyInterface
 
 public:
 	ABMEnemy(const FObjectInitializer& ObjectInitializer);
+	virtual void PossessedBy(AController* NewController) override;
 
 	/*EnemyInterface*/
 	virtual void Highlight() override;
@@ -49,6 +53,12 @@ protected:
 	virtual void InitAbilityActorInfo() override;
 	virtual void InitializeDefaultAttributes() const override;
 
+	UPROPERTY(EditAnywhere,Category="AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+
+	UPROPERTY()
+	TObjectPtr<ABattleMageAIController> BattleMageAIController;
+
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="CharcterClassDefaults")
 	int32 Level = 1;
 
@@ -57,5 +67,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;
+
+private:
+
+	UPROPERTY(BlueprintReadOnly,EditDefaultsOnly,Category=Movement,meta=(AllowPrivateAccess = true))
+	UBmCharacterMovementComponent* BMCharacterMovementComponent;
 	
 };

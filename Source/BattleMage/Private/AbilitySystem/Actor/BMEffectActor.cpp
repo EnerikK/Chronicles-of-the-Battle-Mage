@@ -24,6 +24,8 @@ void ABMEffectActor::BeginPlay()
 
 void ABMEffectActor::ApplyEffectToTarget(AActor* Target, TSubclassOf<UGameplayEffect> GameplayEffectClass)
 {
+	const bool bIsEnemy = Target->ActorHasTag(FName("Enemy"));
+	if(bIsEnemy && !bApplyEffectsToEnemies) return;
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target);
 	if (TargetASC == nullptr) return;
 

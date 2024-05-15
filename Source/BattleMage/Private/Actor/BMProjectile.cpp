@@ -54,8 +54,17 @@ void ABMProjectile::Destroyed()
 void ABMProjectile::OnSphereOverlap(UPrimitiveComponent* OverLappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!IsValidOverlap(OtherActor)) return;
-	if (!bHit) OnHit();
+	/*if (!IsValidOverlap(OtherActor)) return;
+	if (!bHit) OnHit();*/
+
+	if(DamageEffectSpecHandle.Data.IsValid() && DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
+	{
+		return;
+	}
+	if(!bHit)
+	{
+		OnHit();
+	}
 
 	if(HasAuthority())
 	{
