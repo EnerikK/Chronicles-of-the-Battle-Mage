@@ -163,20 +163,17 @@ void ABMCharacter::WeaponCollision_Implementation(AWeapon* CurrentWeapon,float R
 		ActorsToIgnore,EDrawDebugTrace::Persistent,HitArray,true,FLinearColor::Gray,
 		FLinearColor::Blue,5.f);
 
-		if(Hit)
-		{
+		
 			for(const auto& GotHit : HitArray)
 			{
 				AActor* HitActor = GotHit.GetActor();
 				if(!AlreadyDamageActors.Contains(HitActor))
 				{
 					AlreadyDamageActors.AddUnique(HitActor);
-					if(AlreadyDamageActors.Num() > 1 ) return;
 					GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Orange,FString::Printf(TEXT("Hit %s"),*HitActor->GetName()));
 
 				}
 			}
-		}
 		
 			//AlreadyDamageActors.AddUnique(GotHit.GetActor());
 			/*if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(AlreadyDamageActors.HeapTop()))
@@ -262,7 +259,7 @@ ECombatState ABMCharacter::GetCombatState() const
 	return Combat->CombatState;
 }
 
-void ABMCharacter::SetStateInCode(ECombatState NewState)
+/*void ABMCharacter::SetStateInCode(ECombatState NewState)
 {
 	if(NewState != CurrentState)
 	{
@@ -364,7 +361,7 @@ void ABMCharacter::SaveHeavyAttack()
 		}
 		HeavyAttackEvent();
 	}
-}
+}*/
 void ABMCharacter::ServerEquipButtonPressed_Implementation()
 {
 	if(Combat)

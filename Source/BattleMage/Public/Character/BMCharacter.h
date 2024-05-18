@@ -58,22 +58,19 @@ public:
 	AWeapon* GetEquippedWeapon();
 	bool IsWeaponEquipped();
 	
-	
 	bool bFinishedSwapping = false;
 	void PlaySwapMontage();
 	
 	ECombatState GetCombatState() const;
 	
-
 	/*States*/
 	ECombatState CurrentState;
-	UFUNCTION(BlueprintCallable)
+	/*UFUNCTION(BlueprintCallable)
 	void SetStateInCode(ECombatState NewState);
 	UFUNCTION(BlueprintCallable,BlueprintPure)
 	bool IsStateEqualToAnyInCode(TArray<ECombatState> StatesToCheck);
 	
-	
-	/*Attack*/
+	/*Attack#1#
 	UPROPERTY(BlueprintReadWrite)
 	int32 AttackIndexInCode = 0;
 	UPROPERTY(BlueprintReadWrite)
@@ -93,7 +90,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SaveLightAttack();
 	UFUNCTION(BlueprintCallable)
-	void SaveHeavyAttack();
+	void SaveHeavyAttack();*/
 	
 	/*Character*/
 	void RotateInPlace(float DeltaTime);

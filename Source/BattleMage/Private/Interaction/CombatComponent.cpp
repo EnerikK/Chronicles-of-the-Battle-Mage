@@ -43,6 +43,119 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent,CombatState);
 
 }
+
+void UCombatComponent::SetStateInCode(ECombatState NewState)
+{
+	if(NewState != CurrentState)
+	{
+		CurrentState = NewState;
+	}
+}
+
+bool UCombatComponent::IsStateEqualToAnyInCode(TArray<ECombatState> StatesToCheck)
+{
+	if(StatesToCheck.Contains(CurrentState))
+	{
+		return true;
+	}
+	return false;
+}
+
+void UCombatComponent::PerformLightAttackInCode(int32 CurrentAttackIndex)
+{
+	AttackIndexInCode = CurrentAttackIndex;
+	
+	if(EquippedWeapon && CombatState == ECombatState::ECState_Unoccupied)
+	{
+		UAnimMontage* LightAttackMontage = EquippedWeapon->AttackMontages[AttackIndexInCode];
+		if(LightAttackMontage)
+		{
+			UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance();
+			if(AnimInstance)
+			{
+				AnimInstance->Montage_Play(LightAttackMontage);
+			}
+			//PlayAnimMontage(LightAttackMontage);
+			SetStateInCode(ECombatState::ECState_Attack);
+			AttackIndexInCode++;
+			if(AttackIndexInCode >= EquippedWeapon->AttackMontages.Num())
+			{
+				AttackIndexInCode = 0;
+			}
+		}
+	}
+}
+
+bool UCombatComponent::PerformHeavyAttackInCode(int32 CurrentAttackIndex)
+{
+	HeavyAttackIndexInCode = CurrentAttackIndex;
+	if(EquippedWeapon && CombatState != ECombatState::ECState_HeavyAttack)
+	{
+		UAnimMontage* HeavyAttackMontage = EquippedWeapon->HeavyAttackMontages[HeavyAttackIndexInCode];
+		if(HeavyAttackMontage)
+		{
+			UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance();
+			if(AnimInstance)
+			{
+				AnimInstance->Montage_Play(HeavyAttackMontage);
+			}
+			SetStateInCode(ECombatState::ECState_HeavyAttack);
+			HeavyAttackIndexInCode++;
+			if(HeavyAttackIndexInCode >= EquippedWeapon->HeavyAttackMontages.Num())
+			{
+				HeavyAttackIndexInCode = 0;
+				return true;
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
+void UCombatComponent::AttackEvent()
+{
+	if(CombatState != ECombatState::ECState_Attack)
+	{
+		PerformLightAttackInCode(AttackIndexInCode);
+	}
+}
+
+void UCombatComponent::HeavyAttackEvent()
+{
+	if(CombatState != ECombatState::ECState_HeavyAttack)
+	{
+		PerformHeavyAttackInCode(HeavyAttackIndexInCode);
+	}
+}
+
+void UCombatComponent::SaveLightAttack()
+{
+	if(bSaveLightAttack)
+	{
+		bSaveLightAttack = false;
+		if(CombatState == ECombatState::ECState_Attack)
+		{
+			AttackEvent();
+			SetStateInCode(ECombatState::ECState_Unoccupied);
+		}
+		AttackEvent();
+	}
+}
+
+void UCombatComponent::SaveHeavyAttack()
+{
+	if(bSaveHeavyAttack)
+	{
+		bSaveHeavyAttack = false;
+		if(CombatState == ECombatState::ECState_HeavyAttack)
+		{
+			HeavyAttackEvent();
+			SetStateInCode(ECombatState::ECState_Unoccupied);
+		}
+		HeavyAttackEvent();
+	}
+}
+
 void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 {
 	if(Character == nullptr || WeaponToEquip == nullptr) return;

@@ -30,6 +30,36 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	/*States*/
+	ECombatState CurrentState;
+	UFUNCTION(BlueprintCallable)
+	void SetStateInCode(ECombatState NewState);
+	UFUNCTION(BlueprintCallable,BlueprintPure)
+	bool IsStateEqualToAnyInCode(TArray<ECombatState> StatesToCheck);
+
+		
+	/*Attack*/
+	UPROPERTY(BlueprintReadWrite)
+	int32 AttackIndexInCode = 0;
+	UPROPERTY(BlueprintReadWrite)
+	int32 HeavyAttackIndexInCode = 0;
+	UPROPERTY(BlueprintReadWrite)
+	bool bSaveLightAttack = false;
+	UPROPERTY(BlueprintReadWrite)
+	bool bSaveHeavyAttack = false;
+	UFUNCTION(BlueprintCallable)
+	void PerformLightAttackInCode(int32 CurrentAttackIndex);
+	UFUNCTION(BlueprintCallable)
+	bool PerformHeavyAttackInCode(int32 CurrentAttackIndex);
+	UFUNCTION(BlueprintCallable)
+	void AttackEvent();
+	UFUNCTION(BlueprintCallable)
+	void HeavyAttackEvent();
+	UFUNCTION(BlueprintCallable)
+	void SaveLightAttack();
+	UFUNCTION(BlueprintCallable)
+	void SaveHeavyAttack();
+
 	
 	void EquipWeapon(AWeapon* WeaponToEquip);
 	bool bShouldSwapWeapon();

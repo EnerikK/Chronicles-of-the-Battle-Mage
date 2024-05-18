@@ -9,10 +9,10 @@ void UBM_AN_SaveLightAttack::Received_Notify(USkeletalMeshComponent* MeshComp, U
 	const FAnimNotifyEventReference& EventReference)
 {
 
-	if(MeshComp && MeshComp->GetOwner())
+	/*if(MeshComp && MeshComp->GetOwner())
 	{
 		ControlledCharacter->SaveLightAttack();
-	}
+	}*/
 	
 }
 

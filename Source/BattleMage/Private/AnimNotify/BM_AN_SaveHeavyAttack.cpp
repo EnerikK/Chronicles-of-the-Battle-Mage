@@ -7,9 +7,9 @@
 void UBM_AN_SaveHeavyAttack::Received_Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
                                              const FAnimNotifyEventReference& EventReference)
 {
-	if(MeshComp && MeshComp->GetOwner())
+	/*if(MeshComp && MeshComp->GetOwner())
 	{
 		ControlledCharacter->SaveHeavyAttack();
-	}
+	}*/
 	
 }
